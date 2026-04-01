@@ -5,38 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>Brief Assessment — City of Sydney</title>
-  <!--
-    Typography: Helvetica Now is the licensed CoS digital typeface.
-    If not available on the user's machine, system-ui fallback is used.
-    Do not substitute with Arial in the UI — Arial is Word/PPT fallback only.
-  -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      /* City of Sydney core palette */
       --cos-green:        #2db84b;
-      --cos-green-access: #188838;   /* AA-compliant green for text on white */
+      --cos-green-access: #188838;
       --cos-blue:         #0850a1;
       --cos-deep-blue:    #041c2c;
       --cos-light:        #f2ece7;
       --cos-white:        #ffffff;
-
-      /* Functional / status colours — used sparingly per 80/20 rule */
       --status-amber:     #92400e;
       --status-amber-bg:  #fffbeb;
       --status-amber-bd:  #fde68a;
       --status-red:       #991b1b;
       --status-red-bg:    #fef2f2;
       --status-red-bd:    #fecaca;
-
-      /* UI chrome */
-      --border:   #d4d4d4;
-      --text:     #041c2c;   /* CoS Deep Blue as body text */
-      --muted:    #5a6472;
-      --surface:  #ffffff;
-      --bg:       #f2ece7;   /* CoS Light as page background */
-
+      --border:           #d4d4d4;
+      --text:             #041c2c;
+      --muted:            #5a6472;
+      --surface:          #ffffff;
+      --bg:               #f2ece7;
       --font: 'Helvetica Now Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
 
@@ -44,68 +33,25 @@
       font-family: var(--font);
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
     /* ── HEADER ─────────────────────────────────────────────────────────── */
     .header {
       background: var(--cos-deep-blue);
-      padding: 0 32px;
+      padding: 0 24px;
       display: flex;
       align-items: stretch;
       justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 20px rgba(4,28,44,0.25);
-    }
-
-    /* CoS wordmark lockup — text-based since we can't embed the logo asset */
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 0;
-    }
-    .header-circle {
-      /* Circle DNA — the core brand shape */
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--cos-green);
       flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      box-shadow: 0 2px 20px rgba(4,28,44,0.3);
+      position: relative;
+      z-index: 50;
     }
-    .header-circle-inner {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--cos-deep-blue);
-    }
-    .header-wordmark {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
-    .header-org {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--cos-white);
-      letter-spacing: 0.02em;
-      line-height: 1.2;
-    }
-    .header-tool {
-      font-size: 10px;
-      color: var(--cos-green);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-weight: 500;
-    }
-
-    /* Green accent bar on left edge of header */
     .header::before {
       content: '';
       position: absolute;
@@ -113,425 +59,270 @@
       width: 4px;
       background: var(--cos-green);
     }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    .header-brand { display: flex; align-items: center; gap: 12px; padding: 13px 0; }
+    .header-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--cos-green);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
-    .header-date {
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-    }
+    .header-circle-inner { width: 14px; height: 14px; border-radius: 50%; background: var(--cos-deep-blue); }
+    .header-org  { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.02em; line-height: 1.2; }
+    .header-tool { font-size: 10px; color: var(--cos-green); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; margin-top: 1px; }
+    .header-right { display: flex; align-items: center; gap: 14px; }
+    .header-date  { font-size: 12px; color: rgba(255,255,255,0.4); }
     .key-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: rgba(255,255,255,0.6);
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 4px;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: rgba(255,255,255,0.55);
+      cursor: pointer; padding: 5px 11px; border-radius: 3px;
       border: 1px solid rgba(255,255,255,0.15);
-      background: none;
-      font-family: var(--font);
+      background: none; font-family: var(--font);
       transition: background 0.15s, color 0.15s;
-      letter-spacing: 0.02em;
     }
     .key-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
     .key-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .key-dot.set   { background: var(--cos-green); }
     .key-dot.unset { background: #f87171; }
 
-    /* ── LAYOUT ─────────────────────────────────────────────────────────── */
-    .main { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+    /* ── TWO-PANEL SHELL ────────────────────────────────────────────────── */
+    .shell {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      gap: 0;
+    }
 
-    /* ── KEY SETUP SCREEN ───────────────────────────────────────────────── */
+    /* Left — assessment panel */
+    .panel-left {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 22px;
+      border-right: 1px solid var(--border);
+    }
+
+    /* Right — session log panel */
+    .panel-right {
+      width: 320px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--cos-deep-blue);
+      overflow: hidden;
+    }
+    .panel-right-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .panel-right-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cos-green);
+    }
+    .log-count {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+    }
+    .panel-right-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+    .panel-right-footer {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+
+    /* ── KEY SCREEN ─────────────────────────────────────────────────────── */
     .key-screen {
-      min-height: calc(100vh - 65px);
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 24px;
     }
     .key-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 44px 48px;
-      max-width: 480px;
+      max-width: 460px;
       width: 100%;
       box-shadow: 0 4px 32px rgba(4,28,44,0.1);
-      position: relative;
-      overflow: hidden;
       animation: fadeUp 0.3s ease both;
     }
-    /* Circle DNA background texture on key card */
-    .key-card::before {
-      content: '';
-      position: absolute;
-      bottom: -80px; right: -80px;
-      width: 240px; height: 240px;
-      border-radius: 50%;
-      background: var(--bg);
-      pointer-events: none;
-    }
-    .key-card-eyebrow {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--cos-green-access);
-      margin-bottom: 8px;
-    }
-    .key-card-title {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--cos-deep-blue);
-      margin-bottom: 10px;
-      line-height: 1.2;
-      letter-spacing: -0.01em;
-    }
-    .key-card-sub {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.65;
-      margin-bottom: 32px;
-    }
+
+    .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cos-green-access); margin-bottom: 8px; }
+    .card-title { font-size: 24px; font-weight: 700; color: var(--cos-deep-blue); margin-bottom: 10px; line-height: 1.2; letter-spacing: -0.01em; }
+    .card-sub { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 30px; }
 
     /* ── FORM ───────────────────────────────────────────────────────────── */
-    .field-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-      display: block;
-    }
+    .field-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; display: block; }
     input[type="password"], input[type="text"] {
-      width: 100%;
-      border: 1.5px solid var(--border);
-      border-radius: 4px;
-      padding: 11px 14px;
-      font-size: 13px;
-      font-family: 'Courier New', monospace;
-      color: var(--text);
-      background: var(--surface);
-      transition: border-color 0.15s, box-shadow 0.15s;
-      letter-spacing: 0.03em;
+      width: 100%; border: 1.5px solid var(--border); border-radius: 4px;
+      padding: 11px 14px; font-size: 13px; font-family: 'Courier New', monospace;
+      color: var(--text); background: var(--surface);
+      transition: border-color 0.15s, box-shadow 0.15s; letter-spacing: 0.03em;
     }
-    input:focus {
-      outline: none;
-      border-color: var(--cos-blue);
-      box-shadow: 0 0 0 3px rgba(8,80,161,0.12);
-    }
-    .field-hint {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 8px;
-      line-height: 1.5;
-    }
+    input:focus { outline: none; border-color: var(--cos-blue); box-shadow: 0 0 0 3px rgba(8,80,161,0.12); }
+    .field-hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
     textarea {
-      width: 100%;
-      border: 1.5px solid var(--border);
-      border-radius: 4px;
-      padding: 13px 14px;
-      font-size: 13px;
-      font-family: var(--font);
-      color: var(--text);
-      resize: vertical;
-      line-height: 1.65;
-      background: var(--surface);
+      width: 100%; border: 1.5px solid var(--border); border-radius: 4px;
+      padding: 12px 14px; font-size: 13px; font-family: var(--font);
+      color: var(--text); resize: vertical; line-height: 1.6; background: var(--surface);
       transition: border-color 0.15s, box-shadow 0.15s;
     }
-    textarea:focus {
-      outline: none;
-      border-color: var(--cos-blue);
-      box-shadow: 0 0 0 3px rgba(8,80,161,0.12);
-    }
+    textarea:focus { outline: none; border-color: var(--cos-blue); box-shadow: 0 0 0 3px rgba(8,80,161,0.12); }
 
     /* ── BUTTONS ────────────────────────────────────────────────────────── */
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 11px 24px;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      font-family: var(--font);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 20px; border-radius: 3px; font-size: 12px;
+      font-weight: 700; border: none; cursor: pointer;
+      font-family: var(--font); letter-spacing: 0.05em; text-transform: uppercase;
       transition: filter 0.15s, transform 0.1s;
     }
-    .btn:hover:not(:disabled)  { filter: brightness(0.9); }
+    .btn:hover:not(:disabled)  { filter: brightness(0.88); }
     .btn:active:not(:disabled) { transform: scale(0.98); }
-    .btn:disabled              { opacity: 0.38; cursor: not-allowed; }
-    .btn-primary { background: var(--cos-deep-blue); color: var(--cos-white); }
+    .btn:disabled { opacity: 0.38; cursor: not-allowed; }
+    .btn-primary { background: var(--cos-deep-blue); color: #fff; }
     .btn-green   { background: var(--cos-green); color: var(--cos-deep-blue); }
-    .btn-ghost   {
-      background: none;
-      border: 1.5px solid var(--border);
-      color: var(--muted);
-      text-transform: none;
-      letter-spacing: 0;
-      font-weight: 600;
-    }
-    .btn-full    { width: 100%; justify-content: center; padding: 13px; font-size: 14px; margin-top: 24px; }
+    .btn-ghost   { background: none; border: 1.5px solid var(--border); color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 600; }
+    .btn-outline-white { background: none; border: 1.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 12px; }
+    .btn-outline-white:hover:not(:disabled) { filter: none; background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.4); }
+    .btn-full { width: 100%; justify-content: center; padding: 13px; font-size: 14px; margin-top: 24px; }
 
-    /* ── CARDS ──────────────────────────────────────────────────────────── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 22px 26px;
-      margin-bottom: 14px;
-    }
-    .section-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
+    /* ── CARD ───────────────────────────────────────────────────────────── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 20px 22px; margin-bottom: 14px; }
+    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
 
     /* ── BRIEF HEADER ───────────────────────────────────────────────────── */
-    .brief-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .brief-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--cos-deep-blue);
-      margin-bottom: 8px;
-      line-height: 1.2;
-      letter-spacing: -0.01em;
-    }
-    .brief-title-green {
-      /* First word or key word in CoS green — split headline technique */
-      color: var(--cos-green-access);
-    }
-    .brief-summary { font-size: 14px; color: var(--muted); line-height: 1.65; }
+    .brief-meta { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .brief-title { font-size: 20px; font-weight: 700; color: var(--cos-deep-blue); margin-bottom: 6px; line-height: 1.25; letter-spacing: -0.01em; }
+    .brief-title-green { color: var(--cos-green-access); }
+    .brief-summary { font-size: 13px; color: var(--muted); line-height: 1.65; }
 
-    /* ── DIMENSIONS GRID ────────────────────────────────────────────────── */
-    .dims-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 12px;
-      margin-bottom: 14px;
-    }
+    /* ── DIMENSIONS ─────────────────────────────────────────────────────── */
+    .dims-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 14px; }
     .dim-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
-      animation: fadeUp 0.3s ease both;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+      padding: 14px 16px; display: flex; flex-direction: column; gap: 7px;
+      position: relative; overflow: hidden; animation: fadeUp 0.3s ease both;
     }
-    /* Left accent stripe per dimension — CoS Deep Blue */
-    .dim-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-    }
-    .dim-card.rag-green::before  { background: var(--cos-green); }
-    .dim-card.rag-amber::before  { background: #d97706; }
-    .dim-card.rag-red::before    { background: #dc2626; }
-
+    .dim-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+    .dim-card.rag-green::before { background: var(--cos-green-access); }
+    .dim-card.rag-amber::before { background: #d97706; }
+    .dim-card.rag-red::before   { background: #dc2626; }
     .dim-card:nth-child(1){animation-delay:.04s} .dim-card:nth-child(2){animation-delay:.08s}
     .dim-card:nth-child(3){animation-delay:.12s} .dim-card:nth-child(4){animation-delay:.16s}
     .dim-card:nth-child(5){animation-delay:.20s} .dim-card:nth-child(6){animation-delay:.24s}
-
     .dim-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .dim-name   { font-size: 13px; font-weight: 700; color: var(--cos-deep-blue); }
-    .dim-desc   { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
-    .dim-summary { font-size: 13px; color: #374151; line-height: 1.5; }
-    .dim-gaps    { display: flex; flex-direction: column; gap: 4px; }
-    .dim-gap {
-      font-size: 12px;
-      color: var(--status-amber);
-      background: var(--status-amber-bg);
-      border: 1px solid var(--status-amber-bd);
-      border-radius: 3px;
-      padding: 4px 9px;
-      line-height: 1.4;
-    }
+    .dim-name   { font-size: 12px; font-weight: 700; color: var(--cos-deep-blue); }
+    .dim-desc   { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+    .dim-summary { font-size: 12px; color: #374151; line-height: 1.5; }
+    .dim-gaps   { display: flex; flex-direction: column; gap: 4px; }
+    .dim-gap    { font-size: 11px; color: var(--status-amber); background: var(--status-amber-bg); border: 1px solid var(--status-amber-bd); border-radius: 3px; padding: 3px 8px; line-height: 1.4; }
 
-    /* ── RAG BADGES ─────────────────────────────────────────────────────── */
-    .rag {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 2px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .rag-green { color: #fff; background: var(--cos-green-access); }
-    .rag-amber { color: #fff; background: #d97706; }
-    .rag-red   { color: #fff; background: #dc2626; }
+    /* ── BADGES ─────────────────────────────────────────────────────────── */
+    .rag { display: inline-block; padding: 2px 8px; border-radius: 2px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; color: #fff; }
+    .rag-green { background: var(--cos-green-access); }
+    .rag-amber { background: #d97706; }
+    .rag-red   { background: #dc2626; }
+    .rec-badge { display: inline-block; padding: 4px 12px; border-radius: 2px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; color: #fff; }
 
-    /* ── RECOMMENDATION BADGE ───────────────────────────────────────────── */
-    .rec-badge {
-      display: inline-block;
-      padding: 5px 14px;
-      border-radius: 2px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* ── QUESTIONS PANEL ────────────────────────────────────────────────── */
+    /* ── QUESTIONS ──────────────────────────────────────────────────────── */
     .questions-panel {
-      background: var(--cos-deep-blue);
-      border-radius: 4px;
-      padding: 20px 24px;
-      margin-bottom: 14px;
-      position: relative;
-      overflow: hidden;
+      background: var(--cos-deep-blue); border-radius: 4px;
+      padding: 18px 20px; margin-bottom: 14px;
+      position: relative; overflow: hidden;
       animation: fadeUp 0.3s ease 0.28s both;
     }
-    /* Circle DNA as background texture */
     .questions-panel::after {
-      content: '';
-      position: absolute;
-      right: -60px; top: -60px;
-      width: 200px; height: 200px;
-      border-radius: 50%;
-      border: 2px solid rgba(45,184,75,0.15);
-      pointer-events: none;
+      content: ''; position: absolute; right: -50px; top: -50px;
+      width: 180px; height: 180px; border-radius: 50%;
+      border: 2px solid rgba(45,184,75,0.12); pointer-events: none;
     }
-    .questions-panel .section-label { color: var(--cos-green); margin-bottom: 12px; }
-    .question-item {
-      display: flex;
-      gap: 10px;
-      font-size: 13px;
-      color: rgba(255,255,255,0.88);
-      margin-bottom: 8px;
-      line-height: 1.55;
-    }
+    .questions-panel .section-label { color: var(--cos-green); margin-bottom: 10px; }
+    .question-item { display: flex; gap: 9px; font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 7px; line-height: 1.5; }
     .question-item:last-child { margin-bottom: 0; }
     .question-num { color: var(--cos-green); font-weight: 700; flex-shrink: 0; }
 
-    /* ── RECOMMENDATION PANEL ───────────────────────────────────────────── */
+    /* ── RECOMMENDATION ─────────────────────────────────────────────────── */
     .rec-panel { animation: fadeUp 0.3s ease 0.32s both; }
-    .rec-ai-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--bg);
-    }
+    .rec-ai-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--bg); }
     .rec-rationale { font-size: 13px; color: var(--muted); line-height: 1.6; }
-    .conditions-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--bg); }
-    .condition-item {
-      font-size: 13px;
-      color: var(--status-amber);
-      background: var(--status-amber-bg);
-      border: 1px solid var(--status-amber-bd);
-      border-radius: 3px;
-      padding: 6px 11px;
-    }
-
-    .override-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .conditions-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--bg); }
+    .condition-item { font-size: 13px; color: var(--status-amber); background: var(--status-amber-bg); border: 1px solid var(--status-amber-bd); border-radius: 3px; padding: 5px 10px; }
+    .override-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 8px; }
     .override-btn {
-      padding: 7px 16px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: var(--font);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      border: 1.5px solid;
-      transition: all 0.15s;
-      background: var(--bg);
+      padding: 6px 13px; border-radius: 3px; font-size: 11px; font-weight: 700;
+      cursor: pointer; font-family: var(--font); letter-spacing: 0.05em;
+      text-transform: uppercase; border: 1.5px solid; transition: all 0.15s; background: var(--bg);
     }
-    .override-btn:hover   { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(4,28,44,0.12); }
-    .override-btn.active  { box-shadow: 0 0 0 2.5px currentColor; }
+    .override-btn:hover  { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(4,28,44,0.1); }
+    .override-btn.active { box-shadow: 0 0 0 2px currentColor; }
 
-    /* ── SESSION LOG ────────────────────────────────────────────────────── */
-    .log-section { margin-top: 36px; }
-    .log-entry {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 12px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-      animation: fadeUp 0.2s ease both;
+    /* ── SESSION LOG (right panel) ──────────────────────────────────────── */
+    .log-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; gap: 12px; padding: 24px; text-align: center;
     }
-    .log-entry-title { font-size: 13px; font-weight: 700; color: var(--cos-deep-blue); }
-    .log-entry-time  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .log-empty-circle {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .log-empty-text { font-size: 12px; color: rgba(255,255,255,0.3); line-height: 1.5; }
+
+    .log-entry {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px; padding: 11px 13px;
+      margin-bottom: 8px; animation: fadeUp 0.2s ease both;
+    }
+    .log-entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+    .log-entry-num  { font-size: 10px; color: var(--cos-green); font-weight: 700; flex-shrink: 0; letter-spacing: 0.05em; }
+    .log-entry-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.88); line-height: 1.3; }
+    .log-entry-time  { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 3px; }
+    .log-entry-notes { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 5px; font-style: italic; line-height: 1.4; }
 
     /* ── MODAL ──────────────────────────────────────────────────────────── */
     .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(4,28,44,0.55);
+      position: fixed; inset: 0; background: rgba(4,28,44,0.6);
       display: flex; align-items: center; justify-content: center;
-      z-index: 200;
-      animation: fadeIn 0.15s ease;
+      z-index: 200; animation: fadeIn 0.15s ease;
     }
     .modal-card {
-      background: var(--surface);
-      border-radius: 4px;
-      padding: 36px 40px;
-      max-width: 420px;
-      width: 90%;
-      box-shadow: 0 24px 64px rgba(4,28,44,0.22);
+      background: var(--surface); border-radius: 4px; padding: 36px 40px;
+      max-width: 420px; width: 90%;
+      box-shadow: 0 24px 64px rgba(4,28,44,0.25);
       animation: fadeUp 0.2s ease both;
     }
-    .modal-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cos-green-access); margin-bottom: 6px; }
     .modal-title { font-size: 20px; font-weight: 700; color: var(--cos-deep-blue); margin-bottom: 8px; letter-spacing: -0.01em; }
     .modal-sub   { font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.55; }
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
 
-    /* ── ERROR ──────────────────────────────────────────────────────────── */
-    .error-box {
-      background: var(--status-red-bg);
-      border: 1px solid var(--status-red-bd);
-      border-radius: 3px;
-      padding: 11px 14px;
-      font-size: 13px;
-      color: var(--status-red);
-    }
-
-    /* ── UTILITIES ──────────────────────────────────────────────────────── */
+    .error-inline { font-size: 12px; color: var(--status-red); flex: 1; }
     .spinner { display: inline-block; animation: spin 0.85s linear infinite; }
-    @keyframes spin    { to { transform: rotate(360deg); } }
-    @keyframes fadeUp  { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
 
-    /* ── RESPONSIVE ─────────────────────────────────────────────────────── */
-    @media (max-width: 600px) {
-      .header { padding: 0 16px; }
-      .main   { padding: 20px 14px 48px; }
-      .key-card { padding: 30px 22px; }
-      .dims-grid { grid-template-columns: 1fr; }
-      .card { padding: 18px; }
-    }
+    @keyframes spin   { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Scrollbar styling for dark panel */
+    .panel-right-body::-webkit-scrollbar { width: 4px; }
+    .panel-right-body::-webkit-scrollbar-track { background: transparent; }
+    .panel-right-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .panel-left::-webkit-scrollbar { width: 6px; }
+    .panel-left::-webkit-scrollbar-track { background: transparent; }
+    .panel-left::-webkit-scrollbar-thumb { background: rgba(4,28,44,0.15); border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -539,10 +330,8 @@
 <!-- HEADER -->
 <div class="header">
   <div class="header-brand">
-    <div class="header-circle">
-      <div class="header-circle-inner"></div>
-    </div>
-    <div class="header-wordmark">
+    <div class="header-circle"><div class="header-circle-inner"></div></div>
+    <div>
       <div class="header-org">City of Sydney</div>
       <div class="header-tool">Brief Assessment</div>
     </div>
@@ -556,13 +345,13 @@
   </div>
 </div>
 
-<!-- KEY SETUP SCREEN -->
-<div id="keyScreen" style="display:none">
-  <div class="main key-screen">
+<!-- KEY SCREEN -->
+<div id="keyScreen" style="display:none; flex:1; overflow:hidden;">
+  <div class="key-screen">
     <div class="key-card">
-      <div class="key-card-eyebrow">Setup required</div>
-      <div class="key-card-title">Enter your API key</div>
-      <div class="key-card-sub">Your key is stored only in this browser and sent directly to the Anthropic API. It never appears in the source code of this tool and is not shared with anyone.</div>
+      <div class="eyebrow">Setup required</div>
+      <div class="card-title">Enter your API key</div>
+      <div class="card-sub">Your key is stored only in this browser and sent directly to the Anthropic API. It never appears in the source code and is not shared with anyone.</div>
       <label class="field-label" for="keyInput">Anthropic API key</label>
       <input type="password" id="keyInput" placeholder="sk-ant-..." autocomplete="off" onkeydown="if(event.key==='Enter')saveKey()" />
       <div class="field-hint">Get a key at <strong>console.anthropic.com</strong>. Set a monthly spend limit when you create it.</div>
@@ -571,24 +360,25 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="appScreen" style="display:none">
-  <div class="main">
+<!-- MAIN TWO-PANEL SHELL -->
+<div id="appScreen" class="shell" style="display:none;">
 
-    <!-- INPUT PANEL -->
+  <!-- LEFT: Assessment -->
+  <div class="panel-left">
+
+    <!-- Input -->
     <div id="inputPanel" class="card">
       <div class="section-label">Paste brief content</div>
-      <textarea id="briefInput" rows="10" placeholder="Paste the full text of the ACO brief from Confluence here..."></textarea>
-      <div style="display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-top:14px;">
-        <span id="inputError" style="display:none; font-size:13px; color:var(--status-red); flex:1;"></span>
+      <textarea id="briefInput" rows="9" placeholder="Paste the full text of the ACO brief from Confluence here..."></textarea>
+      <div style="display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-top:12px;">
+        <span id="inputError" class="error-inline" style="display:none;"></span>
         <button class="btn btn-primary" id="assessBtn" onclick="assessBrief()">Assess Brief</button>
       </div>
     </div>
 
-    <!-- RESULTS PANEL -->
-    <div id="resultsPanel" style="display:none">
+    <!-- Results -->
+    <div id="resultsPanel" style="display:none;">
 
-      <!-- Brief header card -->
       <div class="card" style="animation: fadeUp 0.3s ease both; border-top: 3px solid var(--cos-green);">
         <div class="brief-meta">
           <div style="flex:1;">
@@ -599,57 +389,78 @@
         </div>
       </div>
 
-      <!-- Dimension cards -->
       <div class="dims-grid" id="dimsGrid"></div>
 
-      <!-- Questions for the meeting -->
-      <div class="questions-panel" id="questionsPanel" style="display:none">
+      <div class="questions-panel" id="questionsPanel" style="display:none;">
         <div class="section-label">Questions for the meeting</div>
         <div id="questionsList"></div>
       </div>
 
-      <!-- Recommendation -->
-      <div class="card rec-panel">
+      <div class="card rec-panel" id="recPanel">
         <div class="section-label">Recommendation</div>
-        <div style="font-size:11px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">AI assessment</div>
+        <div style="font-size:10px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">AI assessment</div>
         <div class="rec-ai-row">
           <div class="rec-badge" id="recBadge"></div>
           <div class="rec-rationale" id="recRationale"></div>
         </div>
         <div id="conditionsBlock" style="display:none;">
-          <div style="font-size:11px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">Conditions / actions required</div>
+          <div style="font-size:10px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Conditions / actions required</div>
           <div class="conditions-list" id="conditionsList"></div>
         </div>
-        <div style="border-top:1px solid var(--bg); padding-top:16px;">
-          <div style="font-size:11px; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">Override recommendation</div>
+        <div style="border-top:1px solid var(--bg); padding-top:14px;">
+          <div style="font-size:10px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Override recommendation</div>
           <div class="override-row" id="overrideRow"></div>
         </div>
-        <div style="margin-top:16px;">
-          <div style="font-size:11px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">Meeting notes (optional)</div>
+        <div style="margin-top:14px;">
+          <div style="font-size:10px; color:var(--muted); margin-bottom:7px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Meeting notes</div>
           <textarea id="meetingNotes" rows="3" placeholder="Add any notes from the discussion..."></textarea>
         </div>
-        <div style="display:flex; justify-content:flex-end; margin-top:14px;">
+        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
           <button class="btn btn-green" id="logBtn" onclick="logDecision()">Log decision</button>
         </div>
       </div>
 
     </div>
+  </div>
 
-    <!-- SESSION LOG -->
-    <div id="logSection" class="log-section" style="display:none">
-      <div class="section-label">Session log</div>
+  <!-- RIGHT: Session log -->
+  <div class="panel-right">
+    <div class="panel-right-header">
+      <div>
+        <div class="panel-right-title">Session log</div>
+        <div class="log-count" id="logCount">No decisions logged</div>
+      </div>
+    </div>
+    <div class="panel-right-body" id="logBody">
+      <div class="log-empty" id="logEmpty">
+        <div class="log-empty-circle">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <path d="M10 6v4l2.5 2.5" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="log-empty-text">Logged decisions will appear here as the meeting progresses</div>
+      </div>
       <div id="logList"></div>
     </div>
-
+    <div class="panel-right-footer" id="logFooter" style="display:none;">
+      <button class="btn btn-outline-white" style="width:100%; justify-content:center;" onclick="exportLog()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;">
+          <path d="M7 1v8M4 6l3 3 3-3M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Download session log
+      </button>
+    </div>
   </div>
+
 </div>
 
 <!-- KEY MODAL -->
 <div id="keyModal" class="modal-overlay" style="display:none" onclick="closeModalOutside(event)">
   <div class="modal-card">
-    <div class="modal-eyebrow">API key settings</div>
+    <div class="eyebrow">API key settings</div>
     <div class="modal-title">Update your key</div>
-    <div class="modal-sub">Your key is saved only in this browser's local storage and never transmitted anywhere except directly to the Anthropic API.</div>
+    <div class="modal-sub">Saved only in this browser's local storage. Never transmitted anywhere except directly to the Anthropic API.</div>
     <label class="field-label" for="keyModalInput">Anthropic API key</label>
     <input type="password" id="keyModalInput" placeholder="sk-ant-..." autocomplete="off" />
     <div class="modal-actions">
@@ -756,12 +567,12 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
 
   // ── KEY MANAGEMENT ─────────────────────────────────────────────────────────
   function showKeyScreen() {
-    document.getElementById("keyScreen").style.display = "block";
+    document.getElementById("keyScreen").style.display = "flex";
     document.getElementById("appScreen").style.display = "none";
   }
   function showApp() {
     document.getElementById("keyScreen").style.display = "none";
-    document.getElementById("appScreen").style.display = "block";
+    document.getElementById("appScreen").style.display = "flex";
   }
   function updateKeyIndicator() {
     const has = !!localStorage.getItem("anthropic_key");
@@ -786,8 +597,8 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     document.getElementById("keyModalInput").value = localStorage.getItem("anthropic_key") || "";
     document.getElementById("keyModal").style.display = "flex";
   }
-  function closeKeyModal()  { document.getElementById("keyModal").style.display = "none"; }
-  function closeModalOutside(e) { if (e.target.id === "keyModal") closeKeyModal(); }
+  function closeKeyModal()         { document.getElementById("keyModal").style.display = "none"; }
+  function closeModalOutside(e)    { if (e.target.id === "keyModal") closeKeyModal(); }
   function updateKey() {
     const val = document.getElementById("keyModalInput").value.trim();
     if (!validateKey(val)) return;
@@ -842,7 +653,6 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       const data   = await res.json();
       const raw    = (data.content || []).map(c => c.text || "").join("");
       const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-
       currentResult   = parsed;
       currentOverride = null;
       currentLogged   = false;
@@ -859,21 +669,17 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
 
   // ── RENDER ─────────────────────────────────────────────────────────────────
   function renderResults(r) {
-    document.getElementById("inputPanel").style.display = "none";
+    document.getElementById("inputPanel").style.display   = "none";
     document.getElementById("resultsPanel").style.display = "block";
 
-    // Title — apply CoS split-headline technique: first word in green
     const title = r.brief_title || "Brief Assessment";
     const words = title.split(" ");
     const titleEl = document.getElementById("resultTitle");
-    if (words.length > 1) {
-      titleEl.innerHTML = `<span class="brief-title-green">${words[0]}</span> ${words.slice(1).join(" ")}`;
-    } else {
-      titleEl.textContent = title;
-    }
+    titleEl.innerHTML = words.length > 1
+      ? `<span class="brief-title-green">${words[0]}</span> ${words.slice(1).join(" ")}`
+      : title;
     document.getElementById("resultSummary").textContent = r.brief_summary || "";
 
-    // Dimensions
     const grid = document.getElementById("dimsGrid");
     grid.innerHTML = "";
     DIMENSIONS.forEach(dim => {
@@ -882,10 +688,7 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       el.className = "dim-card rag-" + (d.rating || "amber");
       el.innerHTML =
         `<div class="dim-header">
-          <div>
-            <div class="dim-name">${dim.label}</div>
-            <div class="dim-desc">${dim.desc}</div>
-          </div>
+          <div><div class="dim-name">${dim.label}</div><div class="dim-desc">${dim.desc}</div></div>
           ${ragBadge(d.rating)}
         </div>` +
         (d.summary ? `<div class="dim-summary">${d.summary}</div>` : "") +
@@ -893,8 +696,7 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       grid.appendChild(el);
     });
 
-    // Questions
-    const qs     = r.key_questions || [];
+    const qs = r.key_questions || [];
     const qPanel = document.getElementById("questionsPanel");
     if (qs.length) {
       document.getElementById("questionsList").innerHTML = qs.map((q, i) =>
@@ -905,7 +707,6 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       qPanel.style.display = "none";
     }
 
-    // Recommendation
     applyRecBadge(r.recommendation);
     document.getElementById("recRationale").textContent = r.recommendation_rationale || "";
 
@@ -918,18 +719,17 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       condBlock.style.display = "none";
     }
 
-    // Override buttons
     const row = document.getElementById("overrideRow");
     row.innerHTML = "";
     REC_OPTIONS.forEach(opt => {
       const isActive = opt.value === r.recommendation;
       const btn = document.createElement("button");
-      btn.className = "override-btn" + (isActive ? " active" : "");
-      btn.style.color       = opt.color;
-      btn.style.borderColor = opt.color + "60";
+      btn.className     = "override-btn" + (isActive ? " active" : "");
+      btn.style.color   = opt.color;
+      btn.style.borderColor = opt.color + "55";
       btn.style.background  = isActive ? opt.bg : "var(--bg)";
-      btn.textContent       = opt.label;
-      btn.onclick           = () => setOverride(opt.value);
+      btn.textContent   = opt.label;
+      btn.onclick       = () => setOverride(opt.value);
       row.appendChild(btn);
     });
 
@@ -940,20 +740,20 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
 
   function ragBadge(rating) {
     const map = { green: ["rag-green","Green"], amber: ["rag-amber","Amber"], red: ["rag-red","Red"] };
-    const [cls, label] = map[rating] || ["rag-amber", "—"];
+    const [cls, label] = map[rating] || ["rag-amber","—"];
     return `<span class="rag ${cls}">${label}</span>`;
   }
 
   function applyRecBadge(value) {
     const opt   = REC_OPTIONS.find(r => r.value === value) || REC_OPTIONS[0];
     const badge = document.getElementById("recBadge");
-    badge.textContent    = opt.label;
-    badge.style.color    = "#fff";
+    badge.textContent      = opt.label;
     badge.style.background = opt.color;
+    badge.style.color      = "#fff";
   }
 
   function setOverride(value) {
-    const aiRec   = currentResult?.recommendation;
+    const aiRec = currentResult?.recommendation;
     currentOverride = (value === aiRec && currentOverride === null) ? null : value;
     const effective = currentOverride || aiRec;
     applyRecBadge(effective);
@@ -968,12 +768,26 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
   // ── LOG ────────────────────────────────────────────────────────────────────
   function logDecision() {
     if (!currentResult || currentLogged) return;
+    const r = currentResult;
+    const rec = currentOverride || r.recommendation;
+
+    // Capture full assessment detail for export
     sessionLog.push({
-      title:          currentResult.brief_title || "Untitled Brief",
-      recommendation: currentOverride || currentResult.recommendation,
+      index:          sessionLog.length + 1,
+      title:          r.brief_title || "Untitled Brief",
+      summary:        r.brief_summary || "",
+      recommendation: rec,
+      rationale:      r.recommendation_rationale || "",
+      conditions:     r.conditions || [],
+      questions:      r.key_questions || [],
+      dimensions:     r.dimensions || {},
       notes:          document.getElementById("meetingNotes").value.trim(),
-      time:           new Date().toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" })
+      time:           new Date().toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" }),
+      date:           new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" }),
+      overridden:     !!currentOverride && currentOverride !== r.recommendation,
+      aiRecommendation: r.recommendation
     });
+
     currentLogged = true;
     const btn = document.getElementById("logBtn");
     btn.disabled    = true;
@@ -982,27 +796,146 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
   }
 
   function renderLog() {
-    const section = document.getElementById("logSection");
-    if (!sessionLog.length) { section.style.display = "none"; return; }
-    section.style.display = "block";
-    document.getElementById("logList").innerHTML = sessionLog.map(e => {
+    const empty    = document.getElementById("logEmpty");
+    const list     = document.getElementById("logList");
+    const count    = document.getElementById("logCount");
+    const footer   = document.getElementById("logFooter");
+    const logBody  = document.getElementById("logBody");
+
+    const n = sessionLog.length;
+    count.textContent = n === 1 ? "1 decision logged" : `${n} decisions logged`;
+
+    if (!n) {
+      empty.style.display = "flex";
+      list.innerHTML = "";
+      footer.style.display = "none";
+      return;
+    }
+
+    empty.style.display = "none";
+    footer.style.display = "block";
+
+    list.innerHTML = sessionLog.map(e => {
       const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
+      const overrideNote = e.overridden
+        ? `<div style="font-size:10px; color:rgba(255,255,255,0.3); margin-top:3px;">Override from: ${REC_OPTIONS.find(r=>r.value===e.aiRecommendation)?.label || e.aiRecommendation}</div>`
+        : "";
       return `<div class="log-entry">
-        <div>
-          <div class="log-entry-title">${e.title}</div>
-          <div class="log-entry-time">${e.time}${e.notes ? " &middot; " + e.notes : ""}</div>
+        <div class="log-entry-top">
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+              <span class="log-entry-num">#${e.index}</span>
+              <span class="rec-badge" style="background:${opt?.color}; font-size:10px; padding:2px 8px;">${opt?.label}</span>
+            </div>
+            <div class="log-entry-title">${e.title}</div>
+          </div>
         </div>
-        <span class="rec-badge" style="color:#fff; background:${opt?.color};">${opt?.label}</span>
+        <div class="log-entry-time">${e.time}</div>
+        ${overrideNote}
+        ${e.notes ? `<div class="log-entry-notes">${e.notes}</div>` : ""}
       </div>`;
     }).join("");
+
+    // Scroll to bottom of log
+    logBody.scrollTop = logBody.scrollHeight;
+  }
+
+  // ── EXPORT ─────────────────────────────────────────────────────────────────
+  function exportLog() {
+    if (!sessionLog.length) return;
+
+    const date = new Date().toLocaleDateString("en-AU", {
+      weekday: "long", day: "numeric", month: "long", year: "numeric"
+    });
+
+    const dimLabels = {
+      problem_clarity:      "Problem Clarity",
+      proportionality:      "Proportionality",
+      resourcing_realism:   "Resourcing Realism",
+      efficiency_potential: "Efficiency Potential",
+      brief_completeness:   "Brief Completeness",
+      risk_sensitivity:     "Risk & Sensitivity",
+    };
+
+    let md = `# Brief Assessment — Session Log\n`;
+    md    += `**Date:** ${date}\n`;
+    md    += `**Briefs assessed:** ${sessionLog.length}\n\n`;
+    md    += `---\n\n`;
+
+    sessionLog.forEach((e, i) => {
+      const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
+      md += `## ${i + 1}. ${e.title}\n\n`;
+      md += `**Time:** ${e.time}  \n`;
+      md += `**Decision:** ${opt?.label || e.recommendation}`;
+      if (e.overridden) {
+        const aiOpt = REC_OPTIONS.find(r => r.value === e.aiRecommendation);
+        md += ` *(overridden from AI recommendation: ${aiOpt?.label || e.aiRecommendation})*`;
+      }
+      md += `\n\n`;
+
+      if (e.summary) {
+        md += `**Brief summary:** ${e.summary}\n\n`;
+      }
+
+      md += `**AI rationale:** ${e.rationale}\n\n`;
+
+      if (e.conditions?.length) {
+        md += `**Conditions / actions required:**\n`;
+        e.conditions.forEach(c => { md += `- ${c}\n`; });
+        md += `\n`;
+      }
+
+      // Dimension summary
+      md += `**Dimension assessments:**\n\n`;
+      md += `| Dimension | Rating | Summary |\n`;
+      md += `|-----------|--------|----------|\n`;
+      Object.entries(dimLabels).forEach(([id, label]) => {
+        const d = e.dimensions?.[id] || {};
+        const rating = d.rating ? d.rating.charAt(0).toUpperCase() + d.rating.slice(1) : "—";
+        const summary = (d.summary || "—").replace(/\|/g, "\\|");
+        md += `| ${label} | ${rating} | ${summary} |\n`;
+      });
+      md += `\n`;
+
+      // Gaps
+      const allGaps = Object.entries(dimLabels).flatMap(([id]) =>
+        (e.dimensions?.[id]?.gaps || []).map(g => g)
+      );
+      if (allGaps.length) {
+        md += `**Gaps identified:**\n`;
+        allGaps.forEach(g => { md += `- ${g}\n`; });
+        md += `\n`;
+      }
+
+      if (e.questions?.length) {
+        md += `**Questions raised in meeting:**\n`;
+        e.questions.forEach((q, qi) => { md += `${qi + 1}. ${q}\n`; });
+        md += `\n`;
+      }
+
+      if (e.notes) {
+        md += `**Meeting notes:** ${e.notes}\n\n`;
+      }
+
+      if (i < sessionLog.length - 1) md += `---\n\n`;
+    });
+
+    // Download
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `brief-assessment-${new Date().toISOString().slice(0,10)}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   // ── RESET ──────────────────────────────────────────────────────────────────
   function resetTool() {
     currentResult = null; currentOverride = null; currentLogged = false;
-    document.getElementById("briefInput").value       = "";
-    document.getElementById("inputError").style.display = "none";
-    document.getElementById("inputPanel").style.display   = "block";
+    document.getElementById("briefInput").value          = "";
+    document.getElementById("inputError").style.display  = "none";
+    document.getElementById("inputPanel").style.display  = "block";
     document.getElementById("resultsPanel").style.display = "none";
     document.getElementById("questionsPanel").style.display  = "none";
     document.getElementById("conditionsBlock").style.display = "none";
