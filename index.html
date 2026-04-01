@@ -213,28 +213,59 @@
     .dims-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 14px; }
     .dim-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
-      padding: 14px 16px; display: flex; flex-direction: column; gap: 7px;
+      padding: 14px 16px 14px 20px; display: flex; flex-direction: column; gap: 10px;
       position: relative; overflow: hidden; animation: fadeUp 0.3s ease both;
     }
-    .dim-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+    /* Left accent stripe only — no colour fill on cards */
+    .dim-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
     .dim-card.rag-green::before { background: var(--cos-green-access); }
     .dim-card.rag-amber::before { background: #d97706; }
     .dim-card.rag-red::before   { background: #dc2626; }
     .dim-card:nth-child(1){animation-delay:.04s} .dim-card:nth-child(2){animation-delay:.08s}
     .dim-card:nth-child(3){animation-delay:.12s} .dim-card:nth-child(4){animation-delay:.16s}
     .dim-card:nth-child(5){animation-delay:.20s} .dim-card:nth-child(6){animation-delay:.24s}
-    .dim-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .dim-name   { font-size: 12px; font-weight: 700; color: var(--cos-deep-blue); }
-    .dim-desc   { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
-    .dim-summary { font-size: 12px; color: #374151; line-height: 1.5; }
-    .dim-gaps   { display: flex; flex-direction: column; gap: 4px; }
-    .dim-gap    { font-size: 11px; color: var(--status-amber); background: var(--status-amber-bg); border: 1px solid var(--status-amber-bd); border-radius: 3px; padding: 3px 8px; line-height: 1.4; }
+
+    /* Header row: name + RAG pill */
+    .dim-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .dim-name   { font-size: 12px; font-weight: 700; color: var(--cos-deep-blue); letter-spacing: 0.01em; }
+
+    /* Verdict — the single summary sentence, prominent */
+    .dim-verdict { font-size: 13px; color: var(--text); line-height: 1.55; font-weight: 400; }
+
+    /* Findings — each gap or specific observation as a scannable item */
+    .dim-findings { display: flex; flex-direction: column; gap: 5px; }
+    .dim-finding {
+      display: flex; gap: 8px; align-items: flex-start;
+      font-size: 12px; line-height: 1.45; padding: 6px 10px;
+      border-radius: 3px; border-left: 3px solid;
+    }
+    .dim-finding.finding-gap {
+      color: #7c3e00;
+      background: #fff8ee;
+      border-left-color: #d97706;
+    }
+    .dim-finding.finding-red {
+      color: #7f1d1d;
+      background: #fff5f5;
+      border-left-color: #dc2626;
+    }
+    .dim-finding.finding-ok {
+      color: #14532d;
+      background: #f0faf3;
+      border-left-color: var(--cos-green-access);
+    }
+    .dim-finding-icon { flex-shrink: 0; font-size: 11px; margin-top: 1px; }
 
     /* ── BADGES ─────────────────────────────────────────────────────────── */
-    .rag { display: inline-block; padding: 2px 8px; border-radius: 2px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; color: #fff; }
-    .rag-green { background: var(--cos-green-access); }
-    .rag-amber { background: #d97706; }
-    .rag-red   { background: #dc2626; }
+    .rag {
+      display: inline-block; padding: 2px 8px; border-radius: 2px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
+      border: 1.5px solid;
+    }
+    .rag-green { color: var(--cos-green-access); background: #f0faf3; border-color: var(--cos-green-access); }
+    .rag-amber { color: #92400e; background: #fff8ee; border-color: #d97706; }
+    .rag-red   { color: #991b1b; background: #fff5f5; border-color: #dc2626; }
     .rec-badge { display: inline-block; padding: 4px 12px; border-radius: 2px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; color: #fff; }
 
     /* ── QUESTIONS ──────────────────────────────────────────────────────── */
@@ -686,13 +717,25 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       const d  = r.dimensions?.[dim.id] || {};
       const el = document.createElement("div");
       el.className = "dim-card rag-" + (d.rating || "amber");
+
+      // Findings: gaps get warning styling, colour by severity
+      const findingClass = d.rating === "red" ? "finding-red" : d.rating === "green" ? "finding-ok" : "finding-gap";
+      const findingIcon  = d.rating === "red" ? "✕" : d.rating === "green" ? "✓" : "!";
+      const findingsHtml = (d.gaps?.length)
+        ? `<div class="dim-findings">${d.gaps.map(g =>
+            `<div class="dim-finding ${findingClass}">
+              <span class="dim-finding-icon">${findingIcon}</span>
+              <span>${g}</span>
+            </div>`).join("")}</div>`
+        : "";
+
       el.innerHTML =
         `<div class="dim-header">
-          <div><div class="dim-name">${dim.label}</div><div class="dim-desc">${dim.desc}</div></div>
+          <div class="dim-name">${dim.label}</div>
           ${ragBadge(d.rating)}
         </div>` +
-        (d.summary ? `<div class="dim-summary">${d.summary}</div>` : "") +
-        (d.gaps?.length ? `<div class="dim-gaps">${d.gaps.map(g => `<div class="dim-gap">${g}</div>`).join("")}</div>` : "");
+        (d.summary ? `<div class="dim-verdict">${d.summary}</div>` : "") +
+        findingsHtml;
       grid.appendChild(el);
     });
 
