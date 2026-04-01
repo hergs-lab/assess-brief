@@ -857,75 +857,69 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       risk_sensitivity:     "Risk & Sensitivity",
     };
 
-    let md = `# Brief Assessment — Session Log\n`;
-    md    += `**Date:** ${date}\n`;
-    md    += `**Briefs assessed:** ${sessionLog.length}\n\n`;
-    md    += `---\n\n`;
+    const divider  = "=".repeat(60) + "\n";
+    const dividerS = "-".repeat(60) + "\n";
+
+    let txt = `BRIEF ASSESSMENT — SESSION LOG\n`;
+    txt    += divider;
+    txt    += `Date:              ${date}\n`;
+    txt    += `Briefs assessed:   ${sessionLog.length}\n`;
+    txt    += divider + "\n";
 
     sessionLog.forEach((e, i) => {
       const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
-      md += `## ${i + 1}. ${e.title}\n\n`;
-      md += `**Time:** ${e.time}  \n`;
-      md += `**Decision:** ${opt?.label || e.recommendation}`;
+      txt += `${i + 1}. ${e.title.toUpperCase()}\n`;
+      txt += dividerS;
+      txt += `Time:       ${e.time}\n`;
+      txt += `Decision:   ${opt?.label || e.recommendation}`;
       if (e.overridden) {
         const aiOpt = REC_OPTIONS.find(r => r.value === e.aiRecommendation);
-        md += ` *(overridden from AI recommendation: ${aiOpt?.label || e.aiRecommendation})*`;
+        txt += ` (overridden — AI recommended: ${aiOpt?.label || e.aiRecommendation})`;
       }
-      md += `\n\n`;
+      txt += `\n\n`;
 
       if (e.summary) {
-        md += `**Brief summary:** ${e.summary}\n\n`;
+        txt += `BRIEF SUMMARY\n${e.summary}\n\n`;
       }
 
-      md += `**AI rationale:** ${e.rationale}\n\n`;
+      txt += `AI RATIONALE\n${e.rationale}\n\n`;
 
       if (e.conditions?.length) {
-        md += `**Conditions / actions required:**\n`;
-        e.conditions.forEach(c => { md += `- ${c}\n`; });
-        md += `\n`;
+        txt += `CONDITIONS / ACTIONS REQUIRED\n`;
+        e.conditions.forEach(c => { txt += `  - ${c}\n`; });
+        txt += `\n`;
       }
 
-      // Dimension summary
-      md += `**Dimension assessments:**\n\n`;
-      md += `| Dimension | Rating | Summary |\n`;
-      md += `|-----------|--------|----------|\n`;
+      txt += `DIMENSION ASSESSMENTS\n`;
       Object.entries(dimLabels).forEach(([id, label]) => {
-        const d = e.dimensions?.[id] || {};
+        const d      = e.dimensions?.[id] || {};
         const rating = d.rating ? d.rating.charAt(0).toUpperCase() + d.rating.slice(1) : "—";
-        const summary = (d.summary || "—").replace(/\|/g, "\\|");
-        md += `| ${label} | ${rating} | ${summary} |\n`;
+        const pad    = " ".repeat(Math.max(1, 24 - label.length));
+        txt += `  ${label}${pad}${rating}\n`;
+        if (d.summary) txt += `    ${d.summary}\n`;
+        (d.gaps || []).forEach(g => { txt += `    ! ${g}\n`; });
       });
-      md += `\n`;
-
-      // Gaps
-      const allGaps = Object.entries(dimLabels).flatMap(([id]) =>
-        (e.dimensions?.[id]?.gaps || []).map(g => g)
-      );
-      if (allGaps.length) {
-        md += `**Gaps identified:**\n`;
-        allGaps.forEach(g => { md += `- ${g}\n`; });
-        md += `\n`;
-      }
+      txt += `\n`;
 
       if (e.questions?.length) {
-        md += `**Questions raised in meeting:**\n`;
-        e.questions.forEach((q, qi) => { md += `${qi + 1}. ${q}\n`; });
-        md += `\n`;
+        txt += `QUESTIONS RAISED IN MEETING\n`;
+        e.questions.forEach((q, qi) => { txt += `  ${qi + 1}. ${q}\n`; });
+        txt += `\n`;
       }
 
       if (e.notes) {
-        md += `**Meeting notes:** ${e.notes}\n\n`;
+        txt += `MEETING NOTES\n${e.notes}\n\n`;
       }
 
-      if (i < sessionLog.length - 1) md += `---\n\n`;
+      if (i < sessionLog.length - 1) txt += divider + "\n";
     });
 
     // Download
-    const blob = new Blob([md], { type: "text/markdown" });
+    const blob = new Blob([txt], { type: "text/plain" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href     = url;
-    a.download = `brief-assessment-${new Date().toISOString().slice(0,10)}.md`;
+    a.download = `brief-assessment-${new Date().toISOString().slice(0,10)}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   }
