@@ -368,6 +368,10 @@
     </div>
   </div>
   <div class="header-right">
+    <button class="key-btn" id="newBriefBtn" onclick="resetTool()" style="display:none; color:rgba(255,255,255,0.8); border-color:rgba(255,255,255,0.25);">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      New Brief
+    </button>
     <div class="header-date" id="headerDate"></div>
     <button class="key-btn" onclick="openKeyModal()">
       <div class="key-dot" id="keyDot"></div>
@@ -411,13 +415,8 @@
     <div id="resultsPanel" style="display:none;">
 
       <div class="card" style="animation: fadeUp 0.3s ease both; border-top: 3px solid var(--cos-green);">
-        <div class="brief-meta">
-          <div style="flex:1;">
-            <div class="brief-title" id="resultTitle"></div>
-            <div class="brief-summary" id="resultSummary"></div>
-          </div>
-          <button class="btn btn-ghost" onclick="resetTool()" style="flex-shrink:0; margin-top:2px;">New brief</button>
-        </div>
+        <div class="brief-title" id="resultTitle"></div>
+        <div class="brief-summary" id="resultSummary"></div>
       </div>
 
       <div class="dims-grid" id="dimsGrid"></div>
@@ -446,7 +445,8 @@
           <div style="font-size:10px; color:var(--muted); margin-bottom:7px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Meeting notes</div>
           <textarea id="meetingNotes" rows="3" placeholder="Add any notes from the discussion..."></textarea>
         </div>
-        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+          <button class="btn btn-ghost" id="assessAnotherBtn" onclick="assessAnother()" style="display:none;">Assess another</button>
           <button class="btn btn-green" id="logBtn" onclick="logDecision()">Log decision</button>
         </div>
       </div>
@@ -702,6 +702,7 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
   function renderResults(r) {
     document.getElementById("inputPanel").style.display   = "none";
     document.getElementById("resultsPanel").style.display = "block";
+    document.getElementById("newBriefBtn").style.display  = "flex";
 
     const title = r.brief_title || "Brief Assessment";
     const words = title.split(" ");
@@ -835,6 +836,7 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     const btn = document.getElementById("logBtn");
     btn.disabled    = true;
     btn.textContent = "Logged ✓";
+    document.getElementById("assessAnotherBtn").style.display = "inline-flex";
     renderLog();
   }
 
@@ -967,8 +969,8 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     URL.revokeObjectURL(url);
   }
 
-  // ── RESET ──────────────────────────────────────────────────────────────────
-  function resetTool() {
+  // ── RESET / ASSESS ANOTHER ────────────────────────────────────────────────
+  function assessAnother() {
     currentResult = null; currentOverride = null; currentLogged = false;
     document.getElementById("briefInput").value          = "";
     document.getElementById("inputError").style.display  = "none";
@@ -976,7 +978,14 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     document.getElementById("resultsPanel").style.display = "none";
     document.getElementById("questionsPanel").style.display  = "none";
     document.getElementById("conditionsBlock").style.display = "none";
+    document.getElementById("assessAnotherBtn").style.display = "none";
     document.getElementById("dimsGrid").innerHTML = "";
+    document.getElementById("briefInput").focus();
+  }
+
+  function resetTool() {
+    assessAnother();
+    document.getElementById("newBriefBtn").style.display = "none";
   }
 </script>
 </body>
