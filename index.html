@@ -610,6 +610,9 @@
         <div class="eyebrow" style="margin-bottom:4px;">Session summary</div>
         <div style="font-size:13px; color:var(--muted);">Copy and paste into your Confluence meeting notes page.</div>
       </div>
+      <button class="btn btn-ghost" id="copyDecisionsBtn" onclick="copyDecisionsOnly()" style="flex-shrink:0; font-size:12px;">
+        Decisions only
+      </button>
       <button class="btn btn-primary" id="copyBtn" onclick="copyToClipboard()" style="gap:7px; flex-shrink:0;">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
           <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
@@ -1094,6 +1097,33 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
 
     let html = `<p><strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Briefs assessed:</strong> ${sessionLog.length}</p>`;
 
+    // ── DECISIONS AT A GLANCE ──────────────────────────────────────────────
+    html += `<div style="background:var(--cos-deep-blue); border-radius:4px; padding:18px 20px; margin:14px 0 20px;">`;
+    html += `<div style="font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--cos-green); margin-bottom:12px;">Decisions at a glance</div>`;
+    sessionLog.forEach(e => {
+      const opt        = REC_OPTIONS.find(r => r.value === e.recommendation);
+      const finalRec   = e.revised ? (REC_OPTIONS.find(r => r.value === e.revised.recommendation) || opt) : opt;
+      const rationale  = e.revised ? e.revised.recommendation_rationale : e.rationale;
+      const conditions = e.revised?.conditions?.length ? e.revised.conditions : (e.conditions || []);
+      html += `<div style="border-bottom:1px solid rgba(255,255,255,0.08); padding:10px 0; last-child:border-none;">`;
+      html += `<div style="display:flex; align-items:center; gap:10px; margin-bottom:5px; flex-wrap:wrap;">`;
+      html += `<span style="font-size:13px; font-weight:700; color:#fff;">${e.title}</span>`;
+      html += `<span style="display:inline-block; padding:2px 10px; border-radius:2px; font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; background:${finalRec?.color}; color:#fff;">${finalRec?.label}</span>`;
+      if (e.revised) html += `<span style="font-size:10px; color:rgba(255,255,255,0.4); font-style:italic;">revised after discussion</span>`;
+      html += `</div>`;
+      html += `<p style="font-size:12px; color:rgba(255,255,255,0.65); margin:0 0 5px; line-height:1.5;">${rationale}</p>`;
+      if (conditions.length) {
+        html += `<ul style="margin:4px 0 0 16px; padding:0;">`;
+        conditions.forEach(c => { html += `<li style="font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:2px;">${c}</li>`; });
+        html += `</ul>`;
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+
+    // ── DETAILED BREAKDOWN ─────────────────────────────────────────────────
+    html += `<h2 style="font-size:13px; color:var(--muted); font-weight:700; letter-spacing:0.08em; text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px;">Full assessment detail</h2>`;
+
     sessionLog.forEach((e, i) => {
       const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
       html += `${i > 0 ? "<hr>" : ""}`;
@@ -1171,6 +1201,24 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     let md = `## Brief Assessment — Session Log\n\n`;
     md    += `**Date:** ${date}  \n**Briefs assessed:** ${sessionLog.length}\n\n`;
 
+    // ── DECISIONS AT A GLANCE ──────────────────────────────────────────────
+    md += `## Decisions at a glance\n\n`;
+    sessionLog.forEach(e => {
+      const opt       = REC_OPTIONS.find(r => r.value === e.recommendation);
+      const finalOpt  = e.revised ? (REC_OPTIONS.find(r => r.value === e.revised.recommendation) || opt) : opt;
+      const rationale = e.revised ? e.revised.recommendation_rationale : e.rationale;
+      const conditions = e.revised?.conditions?.length ? e.revised.conditions : (e.conditions || []);
+      md += `**${e.title}** — ${finalOpt?.label || e.recommendation}`;
+      if (e.revised) md += ` *(revised after discussion)*`;
+      md += `\n${rationale}\n`;
+      if (conditions.length) {
+        conditions.forEach(c => { md += `- ${c}\n`; });
+      }
+      md += `\n`;
+    });
+
+    md += `---\n\n## Full assessment detail\n\n`;
+
     sessionLog.forEach((e, i) => {
       const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
       if (i > 0) md += `---\n\n`;
@@ -1222,6 +1270,35 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     });
 
     return md;
+  }
+
+  async function copyDecisionsOnly() {
+    const date = new Date().toLocaleDateString("en-AU", {
+      weekday: "long", day: "numeric", month: "long", year: "numeric"
+    });
+    let md = `## Brief Assessment — ${date}\n\n`;
+    sessionLog.forEach(e => {
+      const opt       = REC_OPTIONS.find(r => r.value === e.recommendation);
+      const finalOpt  = e.revised ? (REC_OPTIONS.find(r => r.value === e.revised.recommendation) || opt) : opt;
+      const rationale = e.revised ? e.revised.recommendation_rationale : e.rationale;
+      const conditions = e.revised?.conditions?.length ? e.revised.conditions : (e.conditions || []);
+      md += `**${e.title}** — ${finalOpt?.label || e.recommendation}`;
+      if (e.revised) md += ` *(revised after discussion)*`;
+      md += `\n${rationale}\n`;
+      if (conditions.length) {
+        conditions.forEach(c => { md += `- ${c}\n`; });
+      }
+      md += `\n`;
+    });
+
+    const btn = document.getElementById("copyDecisionsBtn");
+    try {
+      await navigator.clipboard.writeText(md);
+      btn.textContent = "Copied ✓";
+      setTimeout(() => { btn.textContent = "Decisions only"; }, 2500);
+    } catch {
+      btn.textContent = "Copy failed";
+    }
   }
 
   async function copyToClipboard() {
