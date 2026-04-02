@@ -290,7 +290,24 @@
     .rec-ai-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--bg); }
     .rec-rationale { font-size: 13px; color: var(--muted); line-height: 1.6; }
     .conditions-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--bg); }
-    .condition-item { font-size: 13px; color: var(--status-amber); background: var(--status-amber-bg); border: 1px solid var(--status-amber-bd); border-radius: 3px; padding: 5px 10px; }
+    .condition-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 13px; color: var(--status-amber);
+      background: var(--status-amber-bg); border: 1px solid var(--status-amber-bd);
+      border-radius: 3px; padding: 5px 8px 5px 10px;
+    }
+    .condition-item span { flex: 1; line-height: 1.45; padding-top: 1px; }
+    .condition-remove, .finding-promote {
+      flex-shrink: 0; width: 20px; height: 20px; border-radius: 2px;
+      border: none; cursor: pointer; font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; transition: background 0.15s, color 0.15s; font-family: var(--font);
+      padding: 0;
+    }
+    .condition-remove { background: rgba(146,64,14,0.1); color: var(--status-amber); }
+    .condition-remove:hover { background: rgba(146,64,14,0.22); }
+    .finding-promote { background: rgba(0,0,0,0.07); color: inherit; margin-left: auto; }
+    .finding-promote:hover { background: rgba(0,0,0,0.15); }
     .override-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 8px; }
     .override-btn {
       padding: 6px 13px; border-radius: 3px; font-size: 11px; font-weight: 700;
@@ -342,6 +359,23 @@
 
     .error-inline { font-size: 12px; color: var(--status-red); flex: 1; }
     .spinner { display: inline-block; animation: spin 0.85s linear infinite; }
+
+    /* ── SUMMARY MODAL RENDERED CONTENT ────────────────────────────────── */
+    #summaryRendered h2 { font-size: 16px; font-weight: 700; color: var(--cos-deep-blue); margin: 20px 0 6px; padding-bottom: 6px; border-bottom: 2px solid var(--cos-green); }
+    #summaryRendered h2:first-child { margin-top: 0; }
+    #summaryRendered h3 { font-size: 13px; font-weight: 700; color: var(--cos-deep-blue); margin: 14px 0 5px; text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px; }
+    #summaryRendered p { margin: 0 0 8px; color: var(--muted); }
+    #summaryRendered strong { color: var(--text); font-weight: 700; }
+    #summaryRendered ul { margin: 4px 0 8px 16px; }
+    #summaryRendered li { margin-bottom: 4px; color: var(--muted); }
+    #summaryRendered table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 12px; }
+    #summaryRendered th { background: var(--cos-deep-blue); color: #fff; padding: 6px 10px; text-align: left; font-weight: 700; font-size: 11px; letter-spacing: 0.04em; }
+    #summaryRendered td { padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    #summaryRendered tr:last-child td { border-bottom: none; }
+    #summaryRendered .rating-green { color: var(--cos-green-access); font-weight: 700; }
+    #summaryRendered .rating-amber { color: #d97706; font-weight: 700; }
+    #summaryRendered .rating-red   { color: #dc2626; font-weight: 700; }
+    #summaryRendered hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
     @keyframes spin   { to { transform: rotate(360deg); } }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
@@ -475,15 +509,41 @@
       <div id="logList"></div>
     </div>
     <div class="panel-right-footer" id="logFooter" style="display:none;">
-      <button class="btn btn-outline-white" style="width:100%; justify-content:center;" onclick="exportLog()">
+      <button class="btn btn-outline-white" style="width:100%; justify-content:center;" onclick="openSummaryModal()">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;">
-          <path d="M7 1v8M4 6l3 3 3-3M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M4 4h6M4 7h6M4 10h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
-        Download session log
+        View &amp; copy summary
       </button>
     </div>
   </div>
 
+</div>
+
+<!-- SUMMARY MODAL -->
+<div id="summaryModal" class="modal-overlay" style="display:none" onclick="closeSummaryOutside(event)">
+  <div class="modal-card" style="max-width:680px; width:95%; max-height:85vh; display:flex; flex-direction:column; padding:0; overflow:hidden;">
+    <div style="padding:20px 24px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <div>
+        <div class="eyebrow" style="margin-bottom:4px;">Session summary</div>
+        <div style="font-size:13px; color:var(--muted);">Copy and paste into your Confluence meeting notes page.</div>
+      </div>
+      <button class="btn btn-primary" id="copyBtn" onclick="copyToClipboard()" style="gap:7px; flex-shrink:0;">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Copy to clipboard
+      </button>
+    </div>
+    <div style="flex:1; overflow-y:auto; padding:20px 24px;">
+      <div id="summaryRendered" style="font-size:13px; line-height:1.65; color:var(--text);"></div>
+    </div>
+    <div style="padding:12px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; flex-shrink:0;">
+      <button class="btn btn-ghost" onclick="closeSummaryModal()">Close</button>
+    </div>
+  </div>
 </div>
 
 <!-- KEY MODAL -->
@@ -586,6 +646,7 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
   let currentOverride = null;
   let currentLogged   = false;
   let sessionLog      = [];
+  let activeConditions = []; // live-editable conditions list
 
   // ── INIT ───────────────────────────────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
@@ -719,14 +780,16 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       const el = document.createElement("div");
       el.className = "dim-card rag-" + (d.rating || "amber");
 
-      // Findings: gaps get warning styling, colour by severity
+      // Findings: gaps get warning styling, colour by severity; non-green get a promote (+) button
       const findingClass = d.rating === "red" ? "finding-red" : d.rating === "green" ? "finding-ok" : "finding-gap";
       const findingIcon  = d.rating === "red" ? "✕" : d.rating === "green" ? "✓" : "!";
+      const canPromote   = d.rating !== "green";
       const findingsHtml = (d.gaps?.length)
-        ? `<div class="dim-findings">${d.gaps.map(g =>
-            `<div class="dim-finding ${findingClass}">
+        ? `<div class="dim-findings">${d.gaps.map((g, gi) =>
+            `<div class="dim-finding ${findingClass}" data-dim="${dim.id}" data-gap="${gi}">
               <span class="dim-finding-icon">${findingIcon}</span>
               <span>${g}</span>
+              ${canPromote ? `<button class="finding-promote" title="Add to conditions" onclick="promoteGap(this, '${g.replace(/'/g,"\\'")}')">+</button>` : ""}
             </div>`).join("")}</div>`
         : "";
 
@@ -754,14 +817,9 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     applyRecBadge(r.recommendation);
     document.getElementById("recRationale").textContent = r.recommendation_rationale || "";
 
-    const conditions = r.conditions || [];
-    const condBlock  = document.getElementById("conditionsBlock");
-    if (conditions.length) {
-      document.getElementById("conditionsList").innerHTML = conditions.map(c => `<div class="condition-item">${c}</div>`).join("");
-      condBlock.style.display = "block";
-    } else {
-      condBlock.style.display = "none";
-    }
+    // Seed active conditions from AI result
+    activeConditions = [...(r.conditions || [])];
+    renderConditions();
 
     const row = document.getElementById("overrideRow");
     row.innerHTML = "";
@@ -780,6 +838,41 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     document.getElementById("logBtn").disabled    = false;
     document.getElementById("logBtn").textContent = "Log decision";
     document.getElementById("meetingNotes").value = "";
+  }
+
+  function renderConditions() {
+    const condBlock = document.getElementById("conditionsBlock");
+    const condList  = document.getElementById("conditionsList");
+    if (!activeConditions.length) {
+      condBlock.style.display = "none";
+      return;
+    }
+    condBlock.style.display = "block";
+    condList.innerHTML = activeConditions.map((c, i) =>
+      `<div class="condition-item">
+        <span>${c}</span>
+        <button class="condition-remove" title="Remove condition" onclick="removeCondition(${i})">−</button>
+      </div>`
+    ).join("");
+  }
+
+  function removeCondition(index) {
+    activeConditions.splice(index, 1);
+    renderConditions();
+  }
+
+  function promoteGap(btn, text) {
+    // Avoid duplicates
+    if (activeConditions.includes(text)) return;
+    activeConditions.push(text);
+    renderConditions();
+    // Visual feedback on the finding — disable the button
+    btn.textContent = "✓";
+    btn.disabled = true;
+    btn.style.opacity = "0.4";
+    btn.title = "Added to conditions";
+    // Scroll conditions into view
+    document.getElementById("conditionsBlock").scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function ragBadge(rating) {
@@ -822,7 +915,7 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       summary:        r.brief_summary || "",
       recommendation: rec,
       rationale:      r.recommendation_rationale || "",
-      conditions:     r.conditions || [],
+      conditions:     [...activeConditions],
       questions:      r.key_questions || [],
       dimensions:     r.dimensions || {},
       notes:          document.getElementById("meetingNotes").value.trim(),
@@ -885,14 +978,22 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     logBody.scrollTop = logBody.scrollHeight;
   }
 
-  // ── EXPORT ─────────────────────────────────────────────────────────────────
-  function exportLog() {
+  // ── SUMMARY MODAL ──────────────────────────────────────────────────────────
+  function openSummaryModal() {
     if (!sessionLog.length) return;
+    document.getElementById("summaryRendered").innerHTML = buildSummaryHTML();
+    document.getElementById("copyBtn").textContent = "Copy to clipboard";
+    document.getElementById("copyBtn").innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Copy to clipboard`;
+    document.getElementById("summaryModal").style.display = "flex";
+  }
 
+  function closeSummaryModal() { document.getElementById("summaryModal").style.display = "none"; }
+  function closeSummaryOutside(e) { if (e.target.id === "summaryModal") closeSummaryModal(); }
+
+  function buildSummaryHTML() {
     const date = new Date().toLocaleDateString("en-AU", {
       weekday: "long", day: "numeric", month: "long", year: "numeric"
     });
-
     const dimLabels = {
       problem_clarity:      "Problem Clarity",
       proportionality:      "Proportionality",
@@ -902,76 +1003,129 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
       risk_sensitivity:     "Risk & Sensitivity",
     };
 
-    const divider  = "=".repeat(60) + "\n";
-    const dividerS = "-".repeat(60) + "\n";
-
-    let txt = `BRIEF ASSESSMENT — SESSION LOG\n`;
-    txt    += divider;
-    txt    += `Date:              ${date}\n`;
-    txt    += `Briefs assessed:   ${sessionLog.length}\n`;
-    txt    += divider + "\n";
+    let html = `<p><strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Briefs assessed:</strong> ${sessionLog.length}</p>`;
 
     sessionLog.forEach((e, i) => {
       const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
-      txt += `${i + 1}. ${e.title.toUpperCase()}\n`;
-      txt += dividerS;
-      txt += `Time:       ${e.time}\n`;
-      txt += `Decision:   ${opt?.label || e.recommendation}`;
+      html += `${i > 0 ? "<hr>" : ""}`;
+      html += `<h2>${e.index}. ${e.title}</h2>`;
+      html += `<p><strong>Decision:</strong> ${opt?.label || e.recommendation}`;
       if (e.overridden) {
         const aiOpt = REC_OPTIONS.find(r => r.value === e.aiRecommendation);
-        txt += ` (overridden — AI recommended: ${aiOpt?.label || e.aiRecommendation})`;
+        html += ` <em>(overridden — AI recommended: ${aiOpt?.label || e.aiRecommendation})</em>`;
       }
-      txt += `\n\n`;
+      html += ` &nbsp;<strong>Time:</strong> ${e.time}</p>`;
 
-      if (e.summary) {
-        txt += `BRIEF SUMMARY\n${e.summary}\n\n`;
-      }
+      if (e.summary) html += `<p>${e.summary}</p>`;
 
-      txt += `AI RATIONALE\n${e.rationale}\n\n`;
+      html += `<h3>Assessment rationale</h3><p>${e.rationale}</p>`;
 
       if (e.conditions?.length) {
-        txt += `CONDITIONS / ACTIONS REQUIRED\n`;
-        e.conditions.forEach(c => { txt += `  - ${c}\n`; });
-        txt += `\n`;
+        html += `<h3>Conditions / actions required</h3><ul>`;
+        e.conditions.forEach(c => { html += `<li>${c}</li>`; });
+        html += `</ul>`;
       }
 
-      txt += `DIMENSION ASSESSMENTS\n`;
+      html += `<h3>Dimension assessments</h3>`;
+      html += `<table><thead><tr><th>Dimension</th><th>Rating</th><th>Assessment</th></tr></thead><tbody>`;
+      Object.entries(dimLabels).forEach(([id, label]) => {
+        const d      = e.dimensions?.[id] || {};
+        const rating = d.rating || "amber";
+        const rLabel = rating.charAt(0).toUpperCase() + rating.slice(1);
+        const gaps   = (d.gaps || []).map(g => `<br><small>&#9656; ${g}</small>`).join("");
+        html += `<tr>
+          <td><strong>${label}</strong></td>
+          <td class="rating-${rating}">${rLabel}</td>
+          <td>${d.summary || "—"}${gaps}</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+
+      if (e.questions?.length) {
+        html += `<h3>Questions raised in meeting</h3><ul>`;
+        e.questions.forEach(q => { html += `<li>${q}</li>`; });
+        html += `</ul>`;
+      }
+
+      if (e.notes) html += `<h3>Meeting notes</h3><p>${e.notes}</p>`;
+    });
+
+    return html;
+  }
+
+  function buildSummaryMarkdown() {
+    const date = new Date().toLocaleDateString("en-AU", {
+      weekday: "long", day: "numeric", month: "long", year: "numeric"
+    });
+    const dimLabels = {
+      problem_clarity:      "Problem Clarity",
+      proportionality:      "Proportionality",
+      resourcing_realism:   "Resourcing Realism",
+      efficiency_potential: "Efficiency Potential",
+      brief_completeness:   "Brief Completeness",
+      risk_sensitivity:     "Risk & Sensitivity",
+    };
+
+    let md = `## Brief Assessment — Session Log\n\n`;
+    md    += `**Date:** ${date}  \n**Briefs assessed:** ${sessionLog.length}\n\n`;
+
+    sessionLog.forEach((e, i) => {
+      const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
+      if (i > 0) md += `---\n\n`;
+      md += `### ${e.index}. ${e.title}\n\n`;
+      md += `**Decision:** ${opt?.label || e.recommendation}`;
+      if (e.overridden) {
+        const aiOpt = REC_OPTIONS.find(r => r.value === e.aiRecommendation);
+        md += ` *(overridden — AI recommended: ${aiOpt?.label || e.aiRecommendation})*`;
+      }
+      md += `  \n**Time:** ${e.time}\n\n`;
+      if (e.summary) md += `${e.summary}\n\n`;
+      md += `**Assessment rationale:** ${e.rationale}\n\n`;
+
+      if (e.conditions?.length) {
+        md += `**Conditions / actions required:**\n`;
+        e.conditions.forEach(c => { md += `- ${c}\n`; });
+        md += `\n`;
+      }
+
+      md += `**Dimension assessments:**\n\n`;
+      md += `| Dimension | Rating | Assessment |\n|-----------|--------|------------|\n`;
       Object.entries(dimLabels).forEach(([id, label]) => {
         const d      = e.dimensions?.[id] || {};
         const rating = d.rating ? d.rating.charAt(0).toUpperCase() + d.rating.slice(1) : "—";
-        const pad    = " ".repeat(Math.max(1, 24 - label.length));
-        txt += `  ${label}${pad}${rating}\n`;
-        if (d.summary) txt += `    ${d.summary}\n`;
-        (d.gaps || []).forEach(g => { txt += `    ! ${g}\n`; });
+        const summary = (d.summary || "—").replace(/\|/g, "\\|");
+        md += `| ${label} | ${rating} | ${summary} |\n`;
       });
-      txt += `\n`;
+      md += `\n`;
 
       if (e.questions?.length) {
-        txt += `QUESTIONS RAISED IN MEETING\n`;
-        e.questions.forEach((q, qi) => { txt += `  ${qi + 1}. ${q}\n`; });
-        txt += `\n`;
+        md += `**Questions raised in meeting:**\n`;
+        e.questions.forEach((q, qi) => { md += `${qi + 1}. ${q}\n`; });
+        md += `\n`;
       }
-
-      if (e.notes) {
-        txt += `MEETING NOTES\n${e.notes}\n\n`;
-      }
-
-      if (i < sessionLog.length - 1) txt += divider + "\n";
+      if (e.notes) md += `**Meeting notes:** ${e.notes}\n\n`;
     });
 
-    // Download
-    const blob = new Blob([txt], { type: "text/plain" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href     = url;
-    a.download = `brief-assessment-${new Date().toISOString().slice(0,10)}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    return md;
+  }
+
+  async function copyToClipboard() {
+    const md  = buildSummaryMarkdown();
+    const btn = document.getElementById("copyBtn");
+    try {
+      await navigator.clipboard.writeText(md);
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!`;
+      setTimeout(() => {
+        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Copy to clipboard`;
+      }, 2500);
+    } catch {
+      btn.textContent = "Copy failed — select all and copy manually";
+    }
   }
 
   // ── RESET / ASSESS ANOTHER ────────────────────────────────────────────────
   function assessAnother() {
-    currentResult = null; currentOverride = null; currentLogged = false;
+    currentResult = null; currentOverride = null; currentLogged = false; activeConditions = [];
     document.getElementById("briefInput").value          = "";
     document.getElementById("inputError").style.display  = "none";
     document.getElementById("inputPanel").style.display  = "block";
