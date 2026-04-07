@@ -354,16 +354,6 @@
             <div class="rec-badge" id="revisedBadge"></div>
             <div class="rec-rationale" id="revisedRationale"></div>
           </div>
-          <div id="revisedConditionsBlock" style="display:none;">
-            <div style="font-size:10px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Updated conditions</div>
-            <div class="conditions-list" id="revisedConditionsList"></div>
-          </div>
-        </div>
-
-        <!-- AI conditions -->
-        <div id="conditionsBlock" style="display:none;">
-          <div style="font-size:10px; color:var(--muted); margin-bottom:7px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Conditions / actions required</div>
-          <div class="conditions-list" id="conditionsList"></div>
         </div>
 
         <!-- Override -->
@@ -372,19 +362,24 @@
           <div class="override-row" id="overrideRow"></div>
         </div>
 
-        <!-- Determination form -->
+        <!-- Key considerations (includes AI conditions) -->
         <div class="det-section">
           <div class="det-label">Key considerations</div>
           <div class="bullet-list" id="considerationsList"></div>
           <div class="bullet-input-row">
-            <textarea class="bullet-input" id="considerationInput" rows="1" placeholder="Type a consideration and press +" onkeydown="handleBulletKey(event,'consideration')"></textarea>
-            <button class="bullet-add" onclick="addBullet('consideration')" title="Add">+</button>
+            <textarea class="bullet-input" id="considerationInput" rows="1" placeholder="Add a consideration and press +" onkeydown="handleBulletKey(event)"></textarea>
+            <button class="bullet-add" onclick="addBullet()" title="Add">+</button>
           </div>
         </div>
 
+        <!-- Next steps (tactic-based + bespoke) -->
         <div class="det-section">
           <div class="det-label">Next steps</div>
           <div id="nextStepsList"></div>
+          <div class="bullet-input-row" style="margin-top:8px;">
+            <textarea class="bullet-input" id="nextStepInput" rows="1" placeholder="Add a bespoke next step and press +" onkeydown="handleNextStepKey(event)"></textarea>
+            <button class="bullet-add" onclick="addBespokeNextStep()" title="Add">+</button>
+          </div>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
@@ -702,7 +697,6 @@ key_questions: 2-4 questions the meeting should resolve`;
     // Recommendation
     applyRecBadge(r.recommendation);
     document.getElementById("recRationale").textContent = r.recommendation_rationale || "";
-    renderConditions();
 
     // Override buttons
     const row = document.getElementById("overrideRow");
@@ -718,7 +712,8 @@ key_questions: 2-4 questions the meeting should resolve`;
       row.appendChild(btn);
     });
 
-    // Determination form
+    // Determination form — seed AI conditions into considerations
+    considerations = [...activeConditions];
     renderBullets();
     initNextSteps(r.tactics);
     document.getElementById("logBtn").disabled = false;
@@ -752,32 +747,14 @@ key_questions: 2-4 questions the meeting should resolve`;
     });
   }
 
-  // ── CONDITIONS ─────────────────────────────────────────────────────────────
-  function renderConditions() {
-    const block = document.getElementById("conditionsBlock");
-    const list  = document.getElementById("conditionsList");
-    if (!activeConditions.length) { block.style.display = "none"; return; }
-    block.style.display = "block";
-    list.innerHTML = activeConditions.map((c,i) =>
-      `<div class="condition-item">
-        <span>${esc(c)}</span>
-        <button class="condition-remove" onclick="removeCondition(${i})">−</button>
-      </div>`
-    ).join("");
-  }
-  function removeCondition(i)   { activeConditions.splice(i,1); renderConditions(); }
-  function promoteGap(btn, text) {
-    if (activeConditions.includes(text)) return;
-    activeConditions.push(text);
-    renderConditions();
-    btn.textContent = "✓"; btn.disabled = true; btn.style.opacity = "0.4";
-  }
-
   // ── DETERMINATION BULLETS ──────────────────────────────────────────────────
-  function handleBulletKey(e, type) {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addBullet(type); }
+  function handleBulletKey(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addBullet(); }
   }
-  function addBullet(type) {
+  function handleNextStepKey(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addBespokeNextStep(); }
+  }
+  function addBullet() {
     const input = document.getElementById("considerationInput");
     const text  = input.value.trim();
     if (!text) return;
@@ -800,35 +777,34 @@ key_questions: 2-4 questions the meeting should resolve`;
     ).join("");
   }
 
-  // ── NEXT STEPS (tactic-based) ──────────────────────────────────────────────
-  // nextSteps is an array of { label, assignee, included }
+  // ── NEXT STEPS (tactic-based + bespoke) ────────────────────────────────────
   function initNextSteps(tactics) {
-    nextSteps = (tactics || []).map(t => ({
-      label:    t.label,
-      assignee: "",
-      included: true,
-    }));
+    nextSteps = (tactics || []).map(t => ({ label: t.label, assignee: "", bespoke: false }));
     renderNextSteps();
   }
-  function removeNextStep(i) {
-    nextSteps.splice(i, 1);
+  function removeNextStep(i) { nextSteps.splice(i, 1); renderNextSteps(); }
+  function addBespokeNextStep() {
+    const input = document.getElementById("nextStepInput");
+    const text  = input.value.trim();
+    if (!text) return;
+    nextSteps.push({ label: text, assignee: "", bespoke: true });
+    input.value = "";
     renderNextSteps();
+    input.focus();
   }
   function renderNextSteps() {
     const list = document.getElementById("nextStepsList");
-    if (!nextSteps.length) { list.innerHTML = `<div style="font-size:12px;color:var(--muted);font-style:italic;">No tactics extracted from brief.</div>`; return; }
+    if (!nextSteps.length) { list.innerHTML = `<div style="font-size:12px;color:var(--muted);font-style:italic;">No tactics extracted — add steps below.</div>`; return; }
     list.innerHTML = nextSteps.map((s, i) =>
       `<div class="next-step-row">
-        <span class="next-step-label">${esc(s.label)}</span>
+        <span class="next-step-label">${esc(s.label)}${s.bespoke ? ` <span style="font-size:10px;color:var(--muted);font-style:italic;">bespoke</span>` : ""}</span>
         <input class="next-step-assignee" type="text" placeholder="Assignee" value="${esc(s.assignee)}" oninput="nextSteps[${i}].assignee=this.value" />
         <button class="next-step-remove" onclick="removeNextStep(${i})" title="Remove">×</button>
       </div>`
     ).join("");
   }
   function getNextSteps() {
-    // Re-read assignee values from DOM in case of direct input
-    const rows = document.querySelectorAll(".next-step-row");
-    rows.forEach((row, i) => {
+    document.querySelectorAll(".next-step-row").forEach((row, i) => {
       if (nextSteps[i]) nextSteps[i].assignee = row.querySelector(".next-step-assignee")?.value || "";
     });
     return nextSteps.map(s => ({ label: s.label, assignee: s.assignee }));
@@ -845,7 +821,7 @@ key_questions: 2-4 questions the meeting should resolve`;
       summary:          r.brief_summary || "",
       recommendation:   rec,
       rationale:        r.recommendation_rationale || "",
-      conditions:       [...activeConditions],
+      conditions:       [...considerations],
       considerations:   [...considerations],
       nextSteps:        getNextSteps(),
       tactics:          r.tactics || [],
@@ -1168,9 +1144,9 @@ Be direct and concise — this is a live meeting. If new context changes the vie
         ? `<em style="color:var(--cos-blue);display:block;margin-bottom:3px;font-size:12px;">${esc(parsed.what_changed)}</em>${esc(parsed.recommendation_rationale)}`
         : esc(parsed.recommendation_rationale);
       if (parsed.conditions?.length) {
-        activeConditions = [...parsed.conditions]; renderConditions();
-        document.getElementById("revisedConditionsList").innerHTML = parsed.conditions.map(c=>`<div class="condition-item"><span>${esc(c)}</span></div>`).join("");
-        document.getElementById("revisedConditionsBlock").style.display = "block";
+        // Merge revised conditions into considerations, avoiding duplicates
+        parsed.conditions.forEach(c => { if (!considerations.includes(c)) considerations.push(c); });
+        renderBullets();
       }
       document.getElementById("revisedBlock").style.display = "block";
       document.getElementById("revisedBlock").scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -1192,8 +1168,8 @@ Be direct and concise — this is a live meeting. If new context changes the vie
     renderBullets(); renderNextSteps();
     document.getElementById("chatMessages").innerHTML = "";
     document.getElementById("chatInput").value        = "";
+    document.getElementById("nextStepInput").value    = "";
     document.getElementById("revisedBlock").style.display           = "none";
-    document.getElementById("revisedConditionsBlock").style.display = "none";
     document.getElementById("regenerateBtn").style.display          = "none";
     document.getElementById("briefInput").value            = "";
     document.getElementById("inputError").style.display    = "none";
