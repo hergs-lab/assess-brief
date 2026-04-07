@@ -237,10 +237,15 @@
     .decision-rationale { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 4px; }
 
     /* ── NEXT STEP ROWS ── */
-    .next-step-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--bg); }
+    .next-step-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--bg); cursor: default; transition: background 0.1s; }
     .next-step-row:last-child { border-bottom: none; }
-    .next-step-label { flex: 1; font-size: 13px; color: var(--text); line-height: 1.4; }
-    .next-step-assignee { width: 140px; flex-shrink: 0; border: 1.5px solid var(--border); border-radius: 3px; padding: 5px 8px; font-size: 12px; font-family: var(--font); color: var(--text); background: var(--surface); transition: border-color 0.15s; }
+    .next-step-row.drag-over { background: var(--blue-bg, #EBF3FA); border-radius: 3px; }
+    .next-step-drag { flex-shrink: 0; color: var(--border); cursor: grab; font-size: 14px; padding: 0 2px; line-height: 1; user-select: none; }
+    .next-step-drag:active { cursor: grabbing; }
+    .next-step-name { flex: 1; border: 1.5px solid transparent; border-radius: 3px; padding: 4px 7px; font-size: 13px; font-family: var(--font); color: var(--text); background: transparent; line-height: 1.4; transition: border-color 0.15s, background 0.15s; min-width: 0; }
+    .next-step-name:hover { border-color: var(--border); background: var(--surface); }
+    .next-step-name:focus { outline: none; border-color: var(--cos-blue); background: var(--surface); box-shadow: 0 0 0 3px rgba(8,80,161,0.08); }
+    .next-step-assignee { width: 130px; flex-shrink: 0; border: 1.5px solid var(--border); border-radius: 3px; padding: 4px 7px; font-size: 12px; font-family: var(--font); color: var(--text); background: var(--surface); transition: border-color 0.15s; }
     .next-step-assignee:focus { outline: none; border-color: var(--cos-blue); }
     .next-step-assignee::placeholder { color: var(--muted); }
     .next-step-remove { flex-shrink: 0; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0; opacity: 0.5; line-height: 1; }
@@ -782,32 +787,74 @@ key_questions: 2-4 questions the meeting should resolve`;
     nextSteps = (tactics || []).map(t => ({ label: t.label, assignee: "", bespoke: false }));
     renderNextSteps();
   }
-  function removeNextStep(i) { nextSteps.splice(i, 1); renderNextSteps(); }
+  function removeNextStep(i) { syncNextStepsFromDOM(); nextSteps.splice(i, 1); renderNextSteps(); }
   function addBespokeNextStep() {
     const input = document.getElementById("nextStepInput");
     const text  = input.value.trim();
     if (!text) return;
+    syncNextStepsFromDOM();
     nextSteps.push({ label: text, assignee: "", bespoke: true });
     input.value = "";
     renderNextSteps();
     input.focus();
   }
+  function syncNextStepsFromDOM() {
+    document.querySelectorAll(".next-step-row").forEach((row, i) => {
+      if (!nextSteps[i]) return;
+      nextSteps[i].label    = row.querySelector(".next-step-name")?.value    || nextSteps[i].label;
+      nextSteps[i].assignee = row.querySelector(".next-step-assignee")?.value || "";
+    });
+  }
   function renderNextSteps() {
     const list = document.getElementById("nextStepsList");
-    if (!nextSteps.length) { list.innerHTML = `<div style="font-size:12px;color:var(--muted);font-style:italic;">No tactics extracted — add steps below.</div>`; return; }
+    if (!nextSteps.length) {
+      list.innerHTML = `<div style="font-size:12px;color:var(--muted);font-style:italic;padding:4px 0;">No tactics extracted — add steps below.</div>`;
+      return;
+    }
     list.innerHTML = nextSteps.map((s, i) =>
-      `<div class="next-step-row">
-        <span class="next-step-label">${esc(s.label)}${s.bespoke ? ` <span style="font-size:10px;color:var(--muted);font-style:italic;">bespoke</span>` : ""}</span>
-        <input class="next-step-assignee" type="text" placeholder="Assignee" value="${esc(s.assignee)}" oninput="nextSteps[${i}].assignee=this.value" />
+      `<div class="next-step-row" draggable="true" data-idx="${i}"
+            ondragstart="onDragStart(event,${i})"
+            ondragover="onDragOver(event)"
+            ondragleave="onDragLeave(event)"
+            ondrop="onDrop(event,${i})">
+        <span class="next-step-drag" title="Drag to reorder">⠿</span>
+        <input class="next-step-name" type="text" value="${esc(s.label)}" placeholder="Step description"
+               onchange="nextSteps[${i}].label=this.value" />
+        ${s.bespoke ? `<span style="font-size:10px;color:var(--muted);font-style:italic;flex-shrink:0;">bespoke</span>` : ""}
+        <input class="next-step-assignee" type="text" placeholder="Assignee" value="${esc(s.assignee)}"
+               onchange="nextSteps[${i}].assignee=this.value" />
         <button class="next-step-remove" onclick="removeNextStep(${i})" title="Remove">×</button>
       </div>`
     ).join("");
   }
   function getNextSteps() {
-    document.querySelectorAll(".next-step-row").forEach((row, i) => {
-      if (nextSteps[i]) nextSteps[i].assignee = row.querySelector(".next-step-assignee")?.value || "";
-    });
+    syncNextStepsFromDOM();
     return nextSteps.map(s => ({ label: s.label, assignee: s.assignee }));
+  }
+
+  // ── DRAG AND DROP ──────────────────────────────────────────────────────────
+  let dragIdx = null;
+  function onDragStart(e, i) {
+    dragIdx = i;
+    e.dataTransfer.effectAllowed = "move";
+    e.currentTarget.style.opacity = "0.4";
+    e.currentTarget.addEventListener("dragend", () => { e.currentTarget.style.opacity = ""; }, { once: true });
+  }
+  function onDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    e.currentTarget.classList.add("drag-over");
+  }
+  function onDragLeave(e) { e.currentTarget.classList.remove("drag-over"); }
+  function onDrop(e, dropIdx) {
+    e.preventDefault();
+    e.currentTarget.classList.remove("drag-over");
+    if (dragIdx === null || dragIdx === dropIdx) { dragIdx = null; return; }
+    syncNextStepsFromDOM();
+    const moved = nextSteps.splice(dragIdx, 1)[0];
+    nextSteps.splice(dropIdx, 0, moved);
+    dragIdx = null;
+    renderNextSteps();
   }
 
   // ── LOG ────────────────────────────────────────────────────────────────────
