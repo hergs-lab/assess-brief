@@ -7,428 +7,241 @@
   <title>Brief Assessment — City of Sydney</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --cos-green:        #2db84b;
       --cos-green-access: #188838;
       --cos-blue:         #0850a1;
       --cos-deep-blue:    #041c2c;
       --cos-light:        #f2ece7;
-      --cos-white:        #ffffff;
-      --status-amber:     #92400e;
-      --status-amber-bg:  #fffbeb;
-      --status-amber-bd:  #fde68a;
-      --status-red:       #991b1b;
-      --status-red-bg:    #fef2f2;
-      --status-red-bd:    #fecaca;
       --border:           #d4d4d4;
       --text:             #041c2c;
       --muted:            #5a6472;
       --surface:          #ffffff;
       --bg:               #f2ece7;
+      --amber:            #92400e;
+      --amber-bg:         #fffbeb;
+      --amber-bd:         #fde68a;
+      --red:              #991b1b;
+      --red-bg:           #fef2f2;
+      --red-bd:           #fecaca;
       --font: 'Helvetica Now Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── HEADER ─────────────────────────────────────────────────────────── */
-    .header {
-      background: var(--cos-deep-blue);
-      padding: 0 24px;
-      display: flex;
-      align-items: stretch;
-      justify-content: space-between;
-      flex-shrink: 0;
-      box-shadow: 0 2px 20px rgba(4,28,44,0.3);
-      position: relative;
-      z-index: 50;
-    }
-    .header::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 4px;
-      background: var(--cos-green);
-    }
+    /* ── HEADER ── */
+    .header { background: var(--cos-deep-blue); padding: 0 24px; display: flex; align-items: stretch; justify-content: space-between; flex-shrink: 0; box-shadow: 0 2px 20px rgba(4,28,44,0.3); position: relative; z-index: 50; }
+    .header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--cos-green); }
     .header-brand { display: flex; align-items: center; gap: 12px; padding: 13px 0; }
-    .header-circle {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: var(--cos-green);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
+    .header-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--cos-green); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .header-circle-inner { width: 14px; height: 14px; border-radius: 50%; background: var(--cos-deep-blue); }
     .header-org  { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.02em; line-height: 1.2; }
     .header-tool { font-size: 10px; color: var(--cos-green); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; margin-top: 1px; }
     .header-right { display: flex; align-items: center; gap: 14px; }
     .header-date  { font-size: 12px; color: rgba(255,255,255,0.4); }
-    .key-btn {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; color: rgba(255,255,255,0.55);
-      cursor: pointer; padding: 5px 11px; border-radius: 3px;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: none; font-family: var(--font);
-      transition: background 0.15s, color 0.15s;
-    }
-    .key-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
+    .hbtn { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.55); cursor: pointer; padding: 5px 11px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.15); background: none; font-family: var(--font); transition: background 0.15s, color 0.15s; }
+    .hbtn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
     .key-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .key-dot.set   { background: var(--cos-green); }
-    .key-dot.unset { background: #f87171; }
+    .key-dot.set { background: var(--cos-green); } .key-dot.unset { background: #f87171; }
 
-    /* ── TWO-PANEL SHELL ────────────────────────────────────────────────── */
-    .shell {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-      gap: 0;
-    }
+    /* ── SHELL ── */
+    .shell { display: flex; flex: 1; overflow: hidden; }
+    .panel-left  { flex: 1; overflow-y: auto; padding: 22px 20px; border-right: 1px solid var(--border); }
+    .panel-right { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; background: var(--cos-deep-blue); overflow: hidden; }
+    .panel-left::-webkit-scrollbar  { width: 5px; }
+    .panel-left::-webkit-scrollbar-thumb { background: rgba(4,28,44,0.15); border-radius: 3px; }
 
-    /* Left — assessment panel */
-    .panel-left {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px 22px;
-      border-right: 1px solid var(--border);
-    }
-
-    /* Right — session log panel */
-    .panel-right {
-      width: 320px;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      background: var(--cos-deep-blue);
-      overflow: hidden;
-    }
-    .panel-right-header {
-      padding: 16px 20px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .panel-right-title {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--cos-green);
-    }
-    .log-count {
-      font-size: 11px;
-      color: rgba(255,255,255,0.35);
-    }
-    .panel-right-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px 16px;
-    }
-    .panel-right-footer {
-      padding: 12px 16px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      flex-shrink: 0;
-    }
-
-    /* ── KEY SCREEN ─────────────────────────────────────────────────────── */
-    .key-screen {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .key-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 44px 48px;
-      max-width: 460px;
-      width: 100%;
-      box-shadow: 0 4px 32px rgba(4,28,44,0.1);
-      animation: fadeUp 0.3s ease both;
-    }
-
+    /* ── KEY SCREEN ── */
+    .key-screen { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .key-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 40px 44px; max-width: 460px; width: 100%; box-shadow: 0 4px 32px rgba(4,28,44,0.1); animation: fadeUp 0.3s ease both; }
     .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cos-green-access); margin-bottom: 8px; }
     .card-title { font-size: 24px; font-weight: 700; color: var(--cos-deep-blue); margin-bottom: 10px; line-height: 1.2; letter-spacing: -0.01em; }
-    .card-sub { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 30px; }
+    .card-sub { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 28px; }
 
-    /* ── FORM ───────────────────────────────────────────────────────────── */
+    /* ── FORMS ── */
     .field-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; display: block; }
-    input[type="password"], input[type="text"] {
-      width: 100%; border: 1.5px solid var(--border); border-radius: 4px;
-      padding: 11px 14px; font-size: 13px; font-family: 'Courier New', monospace;
-      color: var(--text); background: var(--surface);
-      transition: border-color 0.15s, box-shadow 0.15s; letter-spacing: 0.03em;
-    }
-    input:focus { outline: none; border-color: var(--cos-blue); box-shadow: 0 0 0 3px rgba(8,80,161,0.12); }
+    input[type="password"] { width: 100%; border: 1.5px solid var(--border); border-radius: 4px; padding: 11px 14px; font-size: 13px; font-family: 'Courier New', monospace; color: var(--text); background: var(--surface); transition: border-color 0.15s, box-shadow 0.15s; }
+    input:focus, textarea:focus { outline: none; border-color: var(--cos-blue); box-shadow: 0 0 0 3px rgba(8,80,161,0.1); }
     .field-hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
-    textarea {
-      width: 100%; border: 1.5px solid var(--border); border-radius: 4px;
-      padding: 12px 14px; font-size: 13px; font-family: var(--font);
-      color: var(--text); resize: vertical; line-height: 1.6; background: var(--surface);
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    textarea:focus { outline: none; border-color: var(--cos-blue); box-shadow: 0 0 0 3px rgba(8,80,161,0.12); }
+    textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 4px; padding: 11px 14px; font-size: 13px; font-family: var(--font); color: var(--text); resize: vertical; line-height: 1.6; background: var(--surface); transition: border-color 0.15s, box-shadow 0.15s; }
 
-    /* ── BUTTONS ────────────────────────────────────────────────────────── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 10px 20px; border-radius: 3px; font-size: 12px;
-      font-weight: 700; border: none; cursor: pointer;
-      font-family: var(--font); letter-spacing: 0.05em; text-transform: uppercase;
-      transition: filter 0.15s, transform 0.1s;
-    }
-    .btn:hover:not(:disabled)  { filter: brightness(0.88); }
-    .btn:active:not(:disabled) { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.38; cursor: not-allowed; }
+    /* ── BUTTONS ── */
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 20px; border-radius: 3px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; font-family: var(--font); letter-spacing: 0.05em; text-transform: uppercase; transition: filter 0.15s, transform 0.1s; }
+    .btn:hover:not(:disabled) { filter: brightness(0.88); } .btn:active:not(:disabled) { transform: scale(0.98); } .btn:disabled { opacity: 0.38; cursor: not-allowed; }
     .btn-primary { background: var(--cos-deep-blue); color: #fff; }
     .btn-green   { background: var(--cos-green); color: var(--cos-deep-blue); }
     .btn-ghost   { background: none; border: 1.5px solid var(--border); color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 600; }
-    .btn-outline-white { background: none; border: 1.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 12px; }
-    .btn-outline-white:hover:not(:disabled) { filter: none; background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.4); }
-    .btn-full { width: 100%; justify-content: center; padding: 13px; font-size: 14px; margin-top: 24px; }
+    .btn-white   { background: none; border: 1.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 12px; }
+    .btn-white:hover:not(:disabled) { filter: none; background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.4); }
+    .btn-full { width: 100%; justify-content: center; padding: 13px; font-size: 14px; margin-top: 22px; }
 
-    /* ── CARD ───────────────────────────────────────────────────────────── */
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 20px 22px; margin-bottom: 14px; }
-    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    /* ── CARDS ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 18px 20px; margin-bottom: 12px; }
+    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
 
-    /* ── BRIEF HEADER ───────────────────────────────────────────────────── */
-    .brief-meta { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
-    .brief-title { font-size: 20px; font-weight: 700; color: var(--cos-deep-blue); margin-bottom: 6px; line-height: 1.25; letter-spacing: -0.01em; }
+    /* ── BRIEF HEADER ── */
+    .brief-title { font-size: 19px; font-weight: 700; color: var(--cos-deep-blue); margin-bottom: 5px; line-height: 1.25; letter-spacing: -0.01em; }
     .brief-title-green { color: var(--cos-green-access); }
-    .brief-summary { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .brief-summary { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
-    /* ── DIMENSIONS ─────────────────────────────────────────────────────── */
-    .dims-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 14px; }
-    .dim-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
-      padding: 14px 16px 14px 20px; display: flex; flex-direction: column; gap: 10px;
-      position: relative; overflow: hidden; animation: fadeUp 0.3s ease both;
-    }
-    /* Left accent stripe only — no colour fill on cards */
-    .dim-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-    .dim-card.rag-green::before { background: var(--cos-green-access); }
-    .dim-card.rag-amber::before { background: #d97706; }
-    .dim-card.rag-red::before   { background: #dc2626; }
-    .dim-card:nth-child(1){animation-delay:.04s} .dim-card:nth-child(2){animation-delay:.08s}
-    .dim-card:nth-child(3){animation-delay:.12s} .dim-card:nth-child(4){animation-delay:.16s}
-    .dim-card:nth-child(5){animation-delay:.20s} .dim-card:nth-child(6){animation-delay:.24s}
+    /* ── COMPACT RAG STRIP ── */
+    .rag-strip { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .rag-chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; border: 1.5px solid; cursor: default; }
+    .rag-chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .rag-chip.green { color: var(--cos-green-access); background: #f0faf3; border-color: var(--cos-green-access); }
+    .rag-chip.green .rag-chip-dot { background: var(--cos-green-access); }
+    .rag-chip.amber { color: var(--amber); background: var(--amber-bg); border-color: #d97706; }
+    .rag-chip.amber .rag-chip-dot { background: #d97706; }
+    .rag-chip.red   { color: var(--red); background: var(--red-bg); border-color: #dc2626; }
+    .rag-chip.red   .rag-chip-dot { background: #dc2626; }
 
-    /* Header row: name + RAG pill */
-    .dim-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .dim-name   { font-size: 12px; font-weight: 700; color: var(--cos-deep-blue); letter-spacing: 0.01em; }
+    /* ── FLAGS (amber/red only) ── */
+    .flags-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+    .flag-item { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; padding: 7px 10px; border-radius: 3px; border-left: 3px solid; line-height: 1.45; }
+    .flag-item.amber { color: #7c3e00; background: #fff8ee; border-left-color: #d97706; }
+    .flag-item.red   { color: #7f1d1d; background: #fff5f5; border-left-color: #dc2626; }
+    .flag-dim { font-weight: 700; flex-shrink: 0; min-width: 110px; }
 
-    /* Verdict — the single summary sentence, prominent */
-    .dim-verdict { font-size: 13px; color: var(--text); line-height: 1.55; font-weight: 400; }
+    /* ── TACTIC LIST ── */
+    .tactic-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 0; }
+    .tactic-item { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .tactic-header { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface); cursor: default; }
+    .tactic-label { flex: 1; font-size: 13px; font-weight: 600; color: var(--cos-deep-blue); }
+    .tactic-pills { display: flex; gap: 5px; flex-shrink: 0; }
+    .tactic-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 2px; letter-spacing: 0.05em; text-transform: uppercase; border: 1.5px solid; }
+    .tactic-pill.yes  { color: var(--cos-green-access); background: #f0faf3; border-color: var(--cos-green-access); }
+    .tactic-pill.no   { color: var(--red); background: var(--red-bg); border-color: #dc2626; }
+    .tactic-pill.qn   { color: var(--amber); background: var(--amber-bg); border-color: #d97706; }
+    .tactic-verbatim { font-size: 11px; color: var(--muted); padding: 7px 12px 8px; background: #fafafa; border-top: 1px solid var(--border); line-height: 1.5; display: none; }
+    .tactic-toggle { font-size: 10px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 0; font-family: var(--font); flex-shrink: 0; text-decoration: underline; text-underline-offset: 2px; }
+    .tactic-toggle:hover { color: var(--cos-deep-blue); }
+    .tactic-note { font-size: 12px; color: var(--muted); font-style: italic; }
 
-    /* Findings — each gap or specific observation as a scannable item */
-    .dim-findings { display: flex; flex-direction: column; gap: 5px; }
-    .dim-finding {
-      display: flex; gap: 8px; align-items: flex-start;
-      font-size: 12px; line-height: 1.45; padding: 6px 10px;
-      border-radius: 3px; border-left: 3px solid;
-    }
-    .dim-finding.finding-gap {
-      color: #7c3e00;
-      background: #fff8ee;
-      border-left-color: #d97706;
-    }
-    .dim-finding.finding-red {
-      color: #7f1d1d;
-      background: #fff5f5;
-      border-left-color: #dc2626;
-    }
-    .dim-finding.finding-ok {
-      color: #14532d;
-      background: #f0faf3;
-      border-left-color: var(--cos-green-access);
-    }
-    .dim-finding-icon { flex-shrink: 0; font-size: 11px; margin-top: 1px; }
-
-    /* ── BADGES ─────────────────────────────────────────────────────────── */
-    .rag {
-      display: inline-block; padding: 2px 8px; border-radius: 2px;
-      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
-      text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
-      border: 1.5px solid;
-    }
-    .rag-green { color: var(--cos-green-access); background: #f0faf3; border-color: var(--cos-green-access); }
-    .rag-amber { color: #92400e; background: #fff8ee; border-color: #d97706; }
-    .rag-red   { color: #991b1b; background: #fff5f5; border-color: #dc2626; }
-    .rec-badge { display: inline-block; padding: 4px 12px; border-radius: 2px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; color: #fff; }
-
-    /* ── QUESTIONS ──────────────────────────────────────────────────────── */
-    .questions-panel {
-      background: var(--cos-deep-blue); border-radius: 4px;
-      padding: 18px 20px; margin-bottom: 14px;
-      position: relative; overflow: hidden;
-      animation: fadeUp 0.3s ease 0.28s both;
-    }
-    .questions-panel::after {
-      content: ''; position: absolute; right: -50px; top: -50px;
-      width: 180px; height: 180px; border-radius: 50%;
-      border: 2px solid rgba(45,184,75,0.12); pointer-events: none;
-    }
-    .questions-panel .section-label { color: var(--cos-green); margin-bottom: 10px; }
-    .question-item { display: flex; gap: 9px; font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 7px; line-height: 1.5; }
+    /* ── QUESTIONS ── */
+    .questions-panel { background: var(--cos-deep-blue); border-radius: 4px; padding: 16px 18px; margin-bottom: 12px; position: relative; overflow: hidden; animation: fadeUp 0.3s ease 0.2s both; }
+    .questions-panel::after { content: ''; position: absolute; right: -50px; top: -50px; width: 160px; height: 160px; border-radius: 50%; border: 2px solid rgba(45,184,75,0.1); pointer-events: none; }
+    .questions-panel .section-label { color: var(--cos-green); }
+    .question-item { display: flex; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.82); margin-bottom: 6px; line-height: 1.5; }
     .question-item:last-child { margin-bottom: 0; }
     .question-num { color: var(--cos-green); font-weight: 700; flex-shrink: 0; }
 
-    /* ── RECOMMENDATION ─────────────────────────────────────────────────── */
-    .rec-panel { animation: fadeUp 0.3s ease 0.32s both; }
-    .rec-ai-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--bg); }
+    /* ── RECOMMENDATION ── */
+    .rec-badge { display: inline-block; padding: 4px 12px; border-radius: 2px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; color: #fff; }
+    .rec-ai-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--bg); }
     .rec-rationale { font-size: 13px; color: var(--muted); line-height: 1.6; }
-    .conditions-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--bg); }
-    .condition-item {
-      display: flex; align-items: flex-start; gap: 8px;
-      font-size: 13px; color: var(--status-amber);
-      background: var(--status-amber-bg); border: 1px solid var(--status-amber-bd);
-      border-radius: 3px; padding: 5px 8px 5px 10px;
-    }
-    .condition-item span { flex: 1; line-height: 1.45; padding-top: 1px; }
-    .condition-remove, .finding-promote {
-      flex-shrink: 0; width: 20px; height: 20px; border-radius: 2px;
-      border: none; cursor: pointer; font-size: 14px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      line-height: 1; transition: background 0.15s, color 0.15s; font-family: var(--font);
-      padding: 0;
-    }
-    .condition-remove { background: rgba(146,64,14,0.1); color: var(--status-amber); }
-    .condition-remove:hover { background: rgba(146,64,14,0.22); }
-    .finding-promote { background: rgba(0,0,0,0.07); color: inherit; margin-left: auto; }
-    .finding-promote:hover { background: rgba(0,0,0,0.15); }
     .override-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 8px; }
-    .override-btn {
-      padding: 6px 13px; border-radius: 3px; font-size: 11px; font-weight: 700;
-      cursor: pointer; font-family: var(--font); letter-spacing: 0.05em;
-      text-transform: uppercase; border: 1.5px solid; transition: all 0.15s; background: var(--bg);
-    }
-    .override-btn:hover  { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(4,28,44,0.1); }
+    .override-btn { padding: 6px 12px; border-radius: 3px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font); letter-spacing: 0.05em; text-transform: uppercase; border: 1.5px solid; transition: all 0.15s; background: var(--bg); }
+    .override-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(4,28,44,0.1); }
     .override-btn.active { box-shadow: 0 0 0 2px currentColor; }
 
-    /* ── SESSION LOG (right panel) ──────────────────────────────────────── */
-    .log-empty {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100%; gap: 12px; padding: 24px; text-align: center;
-    }
-    .log-empty-circle {
-      width: 56px; height: 56px; border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.1);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .log-empty-text { font-size: 12px; color: rgba(255,255,255,0.3); line-height: 1.5; }
+    /* ── CONDITIONS ── */
+    .conditions-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--bg); }
+    .condition-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--amber); background: var(--amber-bg); border: 1px solid var(--amber-bd); border-radius: 3px; padding: 5px 8px 5px 10px; }
+    .condition-item span { flex: 1; line-height: 1.45; padding-top: 1px; }
+    .condition-remove { flex-shrink: 0; width: 20px; height: 20px; border-radius: 2px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; background: rgba(146,64,14,0.1); color: var(--amber); font-family: var(--font); padding: 0; transition: background 0.15s; }
+    .condition-remove:hover { background: rgba(146,64,14,0.22); }
+    .finding-promote { flex-shrink: 0; width: 20px; height: 20px; border-radius: 2px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.07); color: inherit; margin-left: auto; font-family: var(--font); padding: 0; transition: background 0.15s; }
+    .finding-promote:hover { background: rgba(0,0,0,0.15); }
 
-    .log-entry {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 4px; padding: 11px 13px;
-      margin-bottom: 8px; animation: fadeUp 0.2s ease both;
-    }
-    .log-entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
-    .log-entry-num  { font-size: 10px; color: var(--cos-green); font-weight: 700; flex-shrink: 0; letter-spacing: 0.05em; }
-    .log-entry-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.88); line-height: 1.3; }
-    .log-entry-time  { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 3px; }
-    .log-entry-notes { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 5px; font-style: italic; line-height: 1.4; }
+    /* ── REVISED BLOCK ── */
+    .revised-block { display: none; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--bg); }
+    .revised-label { font-size: 10px; color: var(--cos-blue); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 
-    /* ── MODAL ──────────────────────────────────────────────────────────── */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(4,28,44,0.6);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 200; animation: fadeIn 0.15s ease;
-    }
-    .modal-card {
-      background: var(--surface); border-radius: 4px; padding: 36px 40px;
-      max-width: 420px; width: 90%;
-      box-shadow: 0 24px 64px rgba(4,28,44,0.25);
-      animation: fadeUp 0.2s ease both;
-    }
-    .modal-title { font-size: 20px; font-weight: 700; color: var(--cos-deep-blue); margin-bottom: 8px; letter-spacing: -0.01em; }
-    .modal-sub   { font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.55; }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+    /* ── DETERMINATION FORM ── */
+    .det-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--bg); }
+    .det-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .bullet-input-row { display: flex; gap: 7px; align-items: flex-start; margin-bottom: 6px; }
+    .bullet-input { flex: 1; border: 1.5px solid var(--border); border-radius: 3px; padding: 7px 10px; font-size: 13px; font-family: var(--font); color: var(--text); background: var(--surface); line-height: 1.5; resize: none; min-height: 36px; transition: border-color 0.15s, box-shadow 0.15s; }
+    .bullet-add { flex-shrink: 0; width: 32px; height: 36px; border: 1.5px solid var(--border); border-radius: 3px; background: var(--surface); color: var(--muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: var(--font); transition: all 0.15s; }
+    .bullet-add:hover { border-color: var(--cos-green-access); color: var(--cos-green-access); }
+    .bullet-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+    .bullet-entry { display: flex; align-items: flex-start; gap: 7px; font-size: 13px; color: var(--text); }
+    .bullet-entry-text { flex: 1; line-height: 1.5; padding-top: 1px; }
+    .bullet-entry-dot { flex-shrink: 0; color: var(--muted); margin-top: 3px; }
+    .bullet-remove { flex-shrink: 0; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0; line-height: 1; opacity: 0.5; }
+    .bullet-remove:hover { opacity: 1; color: var(--red); }
 
-    .error-inline { font-size: 12px; color: var(--status-red); flex: 1; }
-    .spinner { display: inline-block; animation: spin 0.85s linear infinite; }
-
-    /* ── CHAT PANEL ─────────────────────────────────────────────────────── */
-    .chat-panel { padding-bottom: 14px; }
-    .chat-messages {
-      display: flex; flex-direction: column; gap: 10px;
-      max-height: 320px; overflow-y: auto;
-      margin-bottom: 12px;
-      padding-right: 2px;
-    }
+    /* ── CHAT ── */
+    .chat-panel { padding-bottom: 12px; }
+    .chat-messages { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; margin-bottom: 10px; padding-right: 2px; }
     .chat-messages:empty { display: none; }
     .chat-messages::-webkit-scrollbar { width: 4px; }
     .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
     .chat-msg { display: flex; flex-direction: column; gap: 3px; animation: fadeUp 0.2s ease both; }
     .chat-msg-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-    .chat-msg-label.user-label  { color: var(--cos-blue); text-align: right; }
-    .chat-msg-label.ai-label    { color: var(--cos-green-access); }
-    .chat-msg-bubble {
-      font-size: 13px; line-height: 1.6; padding: 10px 13px;
-      border-radius: 4px; max-width: 92%;
-    }
-    .chat-msg.user  { align-items: flex-end; }
-    .chat-msg.user  .chat-msg-bubble { background: var(--cos-deep-blue); color: #fff; border-bottom-right-radius: 1px; }
-    .chat-msg.ai    { align-items: flex-start; }
-    .chat-msg.ai    .chat-msg-bubble { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 1px; }
-    .chat-msg.ai    .chat-msg-bubble p { margin: 0 0 6px; }
-    .chat-msg.ai    .chat-msg-bubble p:last-child { margin: 0; }
-    .chat-msg.ai    .chat-msg-bubble strong { color: var(--cos-deep-blue); }
+    .chat-msg-label.user-label { color: var(--cos-blue); text-align: right; }
+    .chat-msg-label.ai-label   { color: var(--cos-green-access); }
+    .chat-msg-bubble { font-size: 13px; line-height: 1.6; padding: 9px 12px; border-radius: 4px; max-width: 92%; }
+    .chat-msg.user { align-items: flex-end; }
+    .chat-msg.user .chat-msg-bubble { background: var(--cos-deep-blue); color: #fff; border-bottom-right-radius: 1px; }
+    .chat-msg.ai   { align-items: flex-start; }
+    .chat-msg.ai   .chat-msg-bubble { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 1px; }
+    .chat-msg.ai   .chat-msg-bubble p { margin: 0 0 5px; } .chat-msg.ai .chat-msg-bubble p:last-child { margin: 0; }
+    .chat-msg.ai   .chat-msg-bubble strong { color: var(--cos-deep-blue); }
     .chat-msg.typing .chat-msg-bubble { color: var(--muted); font-style: italic; }
-
-    .chat-input-row { display: flex; gap: 8px; align-items: flex-end; }
-    .chat-input {
-      flex: 1; border: 1.5px solid var(--border); border-radius: 4px;
-      padding: 10px 12px; font-size: 13px; font-family: var(--font);
-      color: var(--text); resize: none; line-height: 1.5; background: var(--surface);
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .chat-input:focus { outline: none; border-color: var(--cos-blue); box-shadow: 0 0 0 3px rgba(8,80,161,0.1); }
-    .chat-send {
-      padding: 10px 14px; flex-shrink: 0; align-self: flex-end;
-      border-radius: 4px; height: 42px;
-    }
+    .chat-input-row { display: flex; gap: 7px; align-items: flex-end; }
+    .chat-input { flex: 1; border: 1.5px solid var(--border); border-radius: 4px; padding: 9px 12px; font-size: 13px; font-family: var(--font); color: var(--text); resize: none; line-height: 1.5; background: var(--surface); transition: border-color 0.15s, box-shadow 0.15s; }
+    .chat-send { padding: 9px 13px; flex-shrink: 0; border-radius: 4px; height: 40px; }
     .chat-send:disabled { opacity: 0.4; }
-    #summaryRendered h2 { font-size: 16px; font-weight: 700; color: var(--cos-deep-blue); margin: 20px 0 6px; padding-bottom: 6px; border-bottom: 2px solid var(--cos-green); }
-    #summaryRendered h2:first-child { margin-top: 0; }
-    #summaryRendered h3 { font-size: 13px; font-weight: 700; color: var(--cos-deep-blue); margin: 14px 0 5px; text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px; }
-    #summaryRendered p { margin: 0 0 8px; color: var(--muted); }
-    #summaryRendered strong { color: var(--text); font-weight: 700; }
-    #summaryRendered ul { margin: 4px 0 8px 16px; }
-    #summaryRendered li { margin-bottom: 4px; color: var(--muted); }
-    #summaryRendered table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 12px; }
-    #summaryRendered th { background: var(--cos-deep-blue); color: #fff; padding: 6px 10px; text-align: left; font-weight: 700; font-size: 11px; letter-spacing: 0.04em; }
-    #summaryRendered td { padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
-    #summaryRendered tr:last-child td { border-bottom: none; }
-    #summaryRendered .rating-green { color: var(--cos-green-access); font-weight: 700; }
-    #summaryRendered .rating-amber { color: #d97706; font-weight: 700; }
-    #summaryRendered .rating-red   { color: #dc2626; font-weight: 700; }
-    #summaryRendered hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
-    @keyframes spin   { to { transform: rotate(360deg); } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    /* Scrollbar styling for dark panel */
+    /* ── RIGHT PANEL ── */
+    .panel-right-header { padding: 14px 18px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
+    .panel-right-title  { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cos-green); }
+    .log-count          { font-size: 11px; color: rgba(255,255,255,0.3); }
+    .panel-right-body   { flex: 1; overflow-y: auto; padding: 10px 14px; }
+    .panel-right-footer { padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; }
     .panel-right-body::-webkit-scrollbar { width: 4px; }
-    .panel-right-body::-webkit-scrollbar-track { background: transparent; }
     .panel-right-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-    .panel-left::-webkit-scrollbar { width: 6px; }
-    .panel-left::-webkit-scrollbar-track { background: transparent; }
-    .panel-left::-webkit-scrollbar-thumb { background: rgba(4,28,44,0.15); border-radius: 3px; }
+    .log-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; padding: 20px; text-align: center; }
+    .log-empty-text { font-size: 12px; color: rgba(255,255,255,0.3); line-height: 1.5; }
+    .log-entry { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 10px 12px; margin-bottom: 7px; animation: fadeUp 0.2s ease both; }
+    .log-entry-top { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; flex-wrap: wrap; }
+    .log-entry-num   { font-size: 10px; color: var(--cos-green); font-weight: 700; }
+    .log-entry-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.88); line-height: 1.3; margin-top: 2px; }
+    .log-entry-time  { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 3px; }
+    .log-entry-notes { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; font-style: italic; }
+    .log-badge { display: inline-block; padding: 2px 8px; border-radius: 2px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; }
+
+    /* ── MODALS ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(4,28,44,0.55); display: flex; align-items: center; justify-content: center; z-index: 200; animation: fadeIn 0.15s ease; }
+    .modal-card { background: var(--surface); border-radius: 4px; padding: 34px 38px; max-width: 420px; width: 90%; box-shadow: 0 24px 64px rgba(4,28,44,0.22); animation: fadeUp 0.2s ease both; }
+    .modal-title { font-size: 20px; font-weight: 700; color: var(--cos-deep-blue); margin-bottom: 8px; }
+    .modal-sub   { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.55; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+    /* ── SUMMARY MODAL ── */
+    .summary-modal-card { background: var(--surface); border-radius: 4px; padding: 0; max-width: 700px; width: 95%; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 64px rgba(4,28,44,0.22); animation: fadeUp 0.2s ease both; }
+    .summary-modal-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
+    .summary-modal-body   { flex: 1; overflow-y: auto; padding: 20px 22px; }
+    .summary-modal-footer { padding: 10px 22px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; flex-shrink: 0; }
+    .summary-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Rendered summary styles */
+    #summaryRendered h2 { font-size: 15px; font-weight: 700; color: var(--cos-deep-blue); margin: 18px 0 6px; padding-bottom: 5px; border-bottom: 2px solid var(--cos-green); }
+    #summaryRendered h2:first-child { margin-top: 0; }
+    #summaryRendered h3 { font-size: 10px; font-weight: 700; color: var(--muted); margin: 12px 0 5px; text-transform: uppercase; letter-spacing: 0.08em; }
+    #summaryRendered p  { margin: 0 0 7px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    #summaryRendered strong { color: var(--text); }
+    #summaryRendered em { color: var(--cos-blue); font-style: italic; }
+    #summaryRendered ul { margin: 3px 0 8px 16px; }
+    #summaryRendered li { margin-bottom: 3px; color: var(--muted); font-size: 13px; }
+    #summaryRendered table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 12px; }
+    #summaryRendered th { background: var(--cos-deep-blue); color: #fff; padding: 5px 10px; text-align: left; font-weight: 700; font-size: 11px; }
+    #summaryRendered td { padding: 5px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    #summaryRendered hr { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+    .decisions-panel { background: var(--cos-deep-blue); border-radius: 4px; padding: 16px 18px; margin-bottom: 18px; }
+    .decisions-panel-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cos-green); margin-bottom: 12px; }
+    .decision-entry { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 10px 0; }
+    .decision-entry:last-child { border-bottom: none; padding-bottom: 0; }
+    .decision-entry-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+    .decision-title { font-size: 13px; font-weight: 700; color: #fff; }
+    .decision-rationale { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 4px; }
+
+    /* ── MISC ── */
+    .error-inline { font-size: 12px; color: var(--red); flex: 1; }
+    .spinner { display: inline-block; animation: spin 0.85s linear infinite; }
+    @keyframes spin    { to { transform: rotate(360deg); } }
+    @keyframes fadeUp  { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
@@ -437,18 +250,15 @@
 <div class="header">
   <div class="header-brand">
     <div class="header-circle"><div class="header-circle-inner"></div></div>
-    <div>
-      <div class="header-org">City of Sydney</div>
-      <div class="header-tool">Brief Assessment</div>
-    </div>
+    <div><div class="header-org">City of Sydney</div><div class="header-tool">Brief Assessment</div></div>
   </div>
   <div class="header-right">
-    <button class="key-btn" id="newBriefBtn" onclick="resetTool()" style="display:none; color:rgba(255,255,255,0.8); border-color:rgba(255,255,255,0.25);">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <button class="hbtn" id="newBriefBtn" onclick="resetTool()" style="display:none; color:rgba(255,255,255,0.8); border-color:rgba(255,255,255,0.25);">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       New Brief
     </button>
     <div class="header-date" id="headerDate"></div>
-    <button class="key-btn" onclick="openKeyModal()">
+    <button class="hbtn" onclick="openKeyModal()">
       <div class="key-dot" id="keyDot"></div>
       <span id="keyLabel">API key</span>
     </button>
@@ -470,17 +280,17 @@
   </div>
 </div>
 
-<!-- MAIN TWO-PANEL SHELL -->
+<!-- MAIN SHELL -->
 <div id="appScreen" class="shell" style="display:none;">
 
-  <!-- LEFT: Assessment -->
+  <!-- LEFT PANEL -->
   <div class="panel-left">
 
     <!-- Input -->
     <div id="inputPanel" class="card">
       <div class="section-label">Paste brief content</div>
       <textarea id="briefInput" rows="9" placeholder="Paste the full text of the ACO brief from Confluence here..."></textarea>
-      <div style="display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-top:12px;">
+      <div style="display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-top:10px;">
         <span id="inputError" class="error-inline" style="display:none;"></span>
         <button class="btn btn-primary" id="assessBtn" onclick="assessBrief()">Assess Brief</button>
       </div>
@@ -489,33 +299,48 @@
     <!-- Results -->
     <div id="resultsPanel" style="display:none;">
 
+      <!-- Brief title -->
       <div class="card" style="animation: fadeUp 0.3s ease both; border-top: 3px solid var(--cos-green);">
         <div class="brief-title" id="resultTitle"></div>
         <div class="brief-summary" id="resultSummary"></div>
       </div>
 
-      <div class="dims-grid" id="dimsGrid"></div>
+      <!-- Tactics -->
+      <div class="card" style="animation: fadeUp 0.3s ease 0.06s both;">
+        <div class="section-label">Proposed tactics</div>
+        <div class="tactic-list" id="tacticList"></div>
+      </div>
 
+      <!-- Compact RAG + flags -->
+      <div class="card" style="animation: fadeUp 0.3s ease 0.1s both;">
+        <div class="section-label">Assessment</div>
+        <div class="rag-strip" id="ragStrip"></div>
+        <div class="flags-list" id="flagsList"></div>
+      </div>
+
+      <!-- Questions -->
       <div class="questions-panel" id="questionsPanel" style="display:none;">
         <div class="section-label">Questions for the meeting</div>
         <div id="questionsList"></div>
       </div>
 
-      <div class="card rec-panel" id="recPanel">
+      <!-- Recommendation + determination -->
+      <div class="card" id="recPanel" style="animation: fadeUp 0.3s ease 0.16s both;">
         <div class="section-label">Recommendation</div>
-        <div style="font-size:10px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">AI assessment</div>
+
+        <div style="font-size:10px; color:var(--muted); margin-bottom:7px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">AI assessment</div>
         <div class="rec-ai-row">
           <div class="rec-badge" id="recBadge"></div>
           <div class="rec-rationale" id="recRationale"></div>
         </div>
 
-        <!-- Revised assessment — shown after regeneration -->
-        <div id="revisedBlock" style="display:none; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--bg);">
-          <div style="font-size:10px; color:var(--cos-blue); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700; display:flex; align-items:center; gap:6px;">
+        <!-- Revised after discussion -->
+        <div class="revised-block" id="revisedBlock">
+          <div class="revised-label">
             <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M1 6a5 5 0 105-5 5 5 0 00-3.5 1.4L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 1v3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Revised after discussion
           </div>
-          <div class="rec-ai-row" style="margin-bottom:8px;">
+          <div class="rec-ai-row" style="margin-bottom:7px;">
             <div class="rec-badge" id="revisedBadge"></div>
             <div class="rec-rationale" id="revisedRationale"></div>
           </div>
@@ -524,77 +349,81 @@
             <div class="conditions-list" id="revisedConditionsList"></div>
           </div>
         </div>
+
+        <!-- AI conditions -->
         <div id="conditionsBlock" style="display:none;">
-          <div style="font-size:10px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Conditions / actions required</div>
+          <div style="font-size:10px; color:var(--muted); margin-bottom:7px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Conditions / actions required</div>
           <div class="conditions-list" id="conditionsList"></div>
         </div>
-        <div style="border-top:1px solid var(--bg); padding-top:14px;">
+
+        <!-- Override -->
+        <div style="border-top:1px solid var(--bg); padding-top:12px;">
           <div style="font-size:10px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Override recommendation</div>
           <div class="override-row" id="overrideRow"></div>
         </div>
-        <div style="margin-top:14px;">
-          <div style="font-size:10px; color:var(--muted); margin-bottom:7px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">Meeting notes</div>
-          <textarea id="meetingNotes" rows="3" placeholder="Add any notes from the discussion..."></textarea>
+
+        <!-- Determination form -->
+        <div class="det-section">
+          <div class="det-label">Key considerations</div>
+          <div class="bullet-list" id="considerationsList"></div>
+          <div class="bullet-input-row">
+            <textarea class="bullet-input" id="considerationInput" rows="1" placeholder="Type a consideration and press +" onkeydown="handleBulletKey(event,'consideration')"></textarea>
+            <button class="bullet-add" onclick="addBullet('consideration')" title="Add">+</button>
+          </div>
         </div>
+
+        <div class="det-section">
+          <div class="det-label">Next steps</div>
+          <div class="bullet-list" id="nextStepsList"></div>
+          <div class="bullet-input-row">
+            <textarea class="bullet-input" id="nextStepInput" rows="1" placeholder="Type a next step and press +" onkeydown="handleBulletKey(event,'nextStep')"></textarea>
+            <button class="bullet-add" onclick="addBullet('nextStep')" title="Add">+</button>
+          </div>
+        </div>
+
         <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
           <button class="btn btn-ghost" id="assessAnotherBtn" onclick="assessAnother()" style="display:none;">Assess another</button>
           <button class="btn btn-green" id="logBtn" onclick="logDecision()">Log decision</button>
         </div>
       </div>
 
-      <!-- Chat thread -->
-      <div class="card chat-panel" id="chatPanel" style="animation: fadeUp 0.3s ease 0.36s both;">
+      <!-- Chat -->
+      <div class="card chat-panel" id="chatPanel" style="animation: fadeUp 0.3s ease 0.22s both;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
           <div class="section-label" style="margin-bottom:0;">Refine or question this assessment</div>
-          <button class="btn btn-ghost" id="regenerateBtn" onclick="regenerateAssessment()" style="display:none; font-size:11px; padding:6px 12px;">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;">
-              <path d="M1 6a5 5 0 105-5 5 5 0 00-3.5 1.4L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M1 1v3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Regenerate assessment
+          <button class="btn btn-ghost" id="regenerateBtn" onclick="regenerateAssessment()" style="display:none; font-size:11px; padding:5px 11px;">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;"><path d="M1 6a5 5 0 105-5 5 5 0 00-3.5 1.4L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 1v3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Regenerate
           </button>
         </div>
         <div id="chatMessages" class="chat-messages"></div>
         <div class="chat-input-row">
           <textarea id="chatInput" class="chat-input" rows="2" placeholder="Ask a question or challenge a rating…" onkeydown="handleChatKey(event)"></textarea>
           <button class="btn btn-primary chat-send" id="chatSendBtn" onclick="sendChatMessage()">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <path d="M1 12L12 6.5 1 1v4.5l7.5 2L1 7.5V12z" fill="currentColor"/>
-            </svg>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 12L12 6.5 1 1v4.5l7.5 2L1 7.5V12z" fill="currentColor"/></svg>
           </button>
         </div>
-        <div style="font-size:11px; color:var(--muted); margin-top:7px;">Shift+Enter for new line · Enter to send</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:6px;">Shift+Enter for new line · Enter to send</div>
       </div>
 
     </div>
   </div>
 
-  <!-- RIGHT: Session log -->
+  <!-- RIGHT PANEL: Session log -->
   <div class="panel-right">
     <div class="panel-right-header">
-      <div>
-        <div class="panel-right-title">Session log</div>
-        <div class="log-count" id="logCount">No decisions logged</div>
-      </div>
+      <div><div class="panel-right-title">Session log</div><div class="log-count" id="logCount">No decisions logged</div></div>
     </div>
     <div class="panel-right-body" id="logBody">
       <div class="log-empty" id="logEmpty">
-        <div class="log-empty-circle">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="10" cy="10" r="8" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
-            <path d="M10 6v4l2.5 2.5" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </div>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="12" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><path d="M14 8v6l3.5 3.5" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-linecap="round"/></svg>
         <div class="log-empty-text">Logged decisions will appear here as the meeting progresses</div>
       </div>
       <div id="logList"></div>
     </div>
     <div class="panel-right-footer" id="logFooter" style="display:none;">
-      <button class="btn btn-outline-white" style="width:100%; justify-content:center;" onclick="openSummaryModal()">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;">
-          <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M4 4h6M4 7h6M4 10h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
+      <button class="btn btn-white" style="width:100%; justify-content:center;" onclick="openSummaryModal()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 4h6M3.5 6.5h6M3.5 9h3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         View &amp; copy summary
       </button>
     </div>
@@ -604,27 +433,24 @@
 
 <!-- SUMMARY MODAL -->
 <div id="summaryModal" class="modal-overlay" style="display:none" onclick="closeSummaryOutside(event)">
-  <div class="modal-card" style="max-width:680px; width:95%; max-height:85vh; display:flex; flex-direction:column; padding:0; overflow:hidden;">
-    <div style="padding:20px 24px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+  <div class="summary-modal-card">
+    <div class="summary-modal-header">
       <div>
-        <div class="eyebrow" style="margin-bottom:4px;">Session summary</div>
-        <div style="font-size:13px; color:var(--muted);">Copy and paste into your Confluence meeting notes page.</div>
+        <div class="eyebrow" style="margin-bottom:3px;">Session summary</div>
+        <div style="font-size:12px; color:var(--muted);">Copy decisions into your Confluence meeting notes page.</div>
       </div>
-      <button class="btn btn-ghost" id="copyDecisionsBtn" onclick="copyDecisionsOnly()" style="flex-shrink:0; font-size:12px;">
-        Decisions only
-      </button>
-      <button class="btn btn-primary" id="copyBtn" onclick="copyToClipboard()" style="gap:7px; flex-shrink:0;">
-        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-          <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        Copy to clipboard
-      </button>
+      <div class="summary-btns">
+        <button class="btn btn-ghost" id="copyDecisionsBtn" onclick="copyDecisionsOnly()" style="font-size:11px; padding:7px 13px;">Decisions only</button>
+        <button class="btn btn-primary" id="copyBtn" onclick="copyToClipboard()" style="font-size:11px; padding:7px 13px; gap:6px;">
+          <svg width="12" height="12" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Full summary
+        </button>
+      </div>
     </div>
-    <div style="flex:1; overflow-y:auto; padding:20px 24px;">
-      <div id="summaryRendered" style="font-size:13px; line-height:1.65; color:var(--text);"></div>
+    <div class="summary-modal-body">
+      <div id="summaryRendered"></div>
     </div>
-    <div style="padding:12px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; flex-shrink:0;">
+    <div class="summary-modal-footer">
       <button class="btn btn-ghost" onclick="closeSummaryModal()">Close</button>
     </div>
   </div>
@@ -648,75 +474,72 @@
 
 <script>
   // ─────────────────────────────────────────────────────────────────────────────
-  // ASSESSMENT CRITERIA
-  // Edit the dimension descriptions below to update how briefs are assessed.
-  // After editing, save and redeploy to GitHub. The team gets the update
-  // automatically on next page load — no resharing required.
+  // ASSESSMENT CRITERIA — edit dimensions here, redeploy to update for the team
   // ─────────────────────────────────────────────────────────────────────────────
 
   const SYSTEM_PROMPT = `You are an expert communications strategist assessing ACO (Audience, Challenges, Opportunities) briefs for a City of Sydney marketing and communications unit.
 
-Assess the submitted brief against these six dimensions and return a structured JSON response. Be specific to this brief — generic observations are not useful.
+Assess the brief and return ONLY valid JSON — no markdown, no preamble.
 
-ASSESSMENT DIMENSIONS:
-
-1. problem_clarity
-Is the audience genuinely specific (not "everyone" or "the community")? Are challenges evidenced rather than assumed? Are opportunities grounded in real insight rather than wishful thinking?
-
-2. proportionality
-Are proposed tactics the right weight for the communications need? Is the scope commensurate with the problem — or is a small need being over-engineered, or a large need under-resourced?
-
-3. resourcing_realism
-Does the team realistically have capacity to deliver this? Are timelines credible? Is specialist input (design, video, media, events) available when needed?
-
-4. efficiency_potential
-Can existing assets be reused or adapted for this brief? Is this brief templatable for future similar needs? Can it be batched with other current briefs to reduce duplication of effort?
-
-5. brief_completeness
-Is there enough information here to actually brief a team or agency and start work? What critical information is missing that would block delivery?
-
-6. risk_sensitivity
-Are there political, reputational, stakeholder, or equity considerations that need flagging or escalation before work proceeds?
-
-For each dimension return:
-- rating: "green" (strong), "amber" (needs attention), or "red" (significant gap)
-- summary: 1-2 sentences specific to this brief — not generic
-- gaps: array of specific gap strings (empty array if none)
-
-Also return:
-- brief_title: extracted or inferred title of the brief
-- brief_summary: 2-3 sentence plain English summary of what this brief is actually asking for
-- recommendation: one of "approve", "approve_conditions", "defer", "decline"
-- recommendation_rationale: 2-3 sentences explaining the recommendation, specific to this brief
-- conditions: array of specific conditions or actions required (for approve_conditions and defer; empty array for approve or decline)
-- key_questions: array of 2-4 questions the assessment meeting should resolve before deciding
-
-Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON object.
-
+Return this exact structure:
 {
   "brief_title": "",
   "brief_summary": "",
+  "tactics": [
+    {
+      "label": "",
+      "verbatim": "",
+      "can_deliver": "yes|no|maybe",
+      "should_deliver": "yes|no|maybe",
+      "note": ""
+    }
+  ],
   "dimensions": {
-    "problem_clarity": { "rating": "", "summary": "", "gaps": [] },
-    "proportionality": { "rating": "", "summary": "", "gaps": [] },
-    "resourcing_realism": { "rating": "", "summary": "", "gaps": [] },
-    "efficiency_potential": { "rating": "", "summary": "", "gaps": [] },
-    "brief_completeness": { "rating": "", "summary": "", "gaps": [] },
-    "risk_sensitivity": { "rating": "", "summary": "", "gaps": [] }
+    "problem_clarity":      { "rating": "green|amber|red", "summary": "", "flags": [] },
+    "proportionality":      { "rating": "green|amber|red", "summary": "", "flags": [] },
+    "resourcing_realism":   { "rating": "green|amber|red", "summary": "", "flags": [] },
+    "efficiency_potential": { "rating": "green|amber|red", "summary": "", "flags": [] },
+    "brief_completeness":   { "rating": "green|amber|red", "summary": "", "flags": [] },
+    "risk_sensitivity":     { "rating": "green|amber|red", "summary": "", "flags": [] }
   },
-  "recommendation": "",
+  "recommendation": "approve|approve_conditions|defer|decline",
   "recommendation_rationale": "",
   "conditions": [],
   "key_questions": []
-}`;
+}
+
+TACTICS:
+Extract each proposed tactic or channel from the brief as a separate item.
+- label: clean, plain English name (e.g. "Social media content", "Media release and outreach")
+- verbatim: the exact text from the brief describing this tactic
+- can_deliver: "yes" if the team realistically has capacity and skills; "no" if not; "maybe" if uncertain
+- should_deliver: "yes" if proportionate and valuable; "no" if not warranted; "maybe" if debatable
+- note: one short sentence explaining any can/should concern, or empty string if both yes
+
+DIMENSIONS:
+- problem_clarity: Is the audience genuinely specific? Challenges evidenced? Opportunities grounded?
+- proportionality: Is the scope commensurate with the need? Are tactics the right weight?
+- resourcing_realism: Realistic capacity? Credible timelines? Specialist input available?
+- efficiency_potential: Assets reusable? Templatable? Batchable with other briefs?
+- brief_completeness: Enough to brief a team and start work? What is missing?
+- risk_sensitivity: Political, reputational, stakeholder or equity risks to flag?
+
+For each dimension:
+- rating: green / amber / red
+- summary: one sentence specific to this brief
+- flags: array of specific issues (empty if green)
+
+recommendation: approve / approve_conditions / defer / decline
+conditions: specific conditions or actions required (empty if approve or decline)
+key_questions: 2-4 questions the meeting should resolve`;
 
   const DIMENSIONS = [
-    { id: "problem_clarity",      label: "Problem Clarity",      desc: "Audience specific? Challenges evidenced? Opportunities grounded?" },
-    { id: "proportionality",      label: "Proportionality",      desc: "Tactics the right weight? Scope commensurate with the need?" },
-    { id: "resourcing_realism",   label: "Resourcing Realism",   desc: "Capacity available? Timelines credible? Specialist input accessible?" },
-    { id: "efficiency_potential", label: "Efficiency Potential", desc: "Assets reusable? Templatable? Batchable with other briefs?" },
-    { id: "brief_completeness",   label: "Brief Completeness",   desc: "Enough to start work? What critical information is missing?" },
-    { id: "risk_sensitivity",     label: "Risk & Sensitivity",   desc: "Political, reputational, stakeholder or equity risks to flag?" },
+    { id: "problem_clarity",      label: "Problem Clarity" },
+    { id: "proportionality",      label: "Proportionality" },
+    { id: "resourcing_realism",   label: "Resourcing Realism" },
+    { id: "efficiency_potential", label: "Efficiency Potential" },
+    { id: "brief_completeness",   label: "Brief Completeness" },
+    { id: "risk_sensitivity",     label: "Risk & Sensitivity" },
   ];
 
   const REC_OPTIONS = [
@@ -726,13 +549,16 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     { value: "decline",            label: "Decline",                 color: "#991b1b", bg: "#fef2f2" },
   ];
 
-  let currentResult   = null;
-  let currentOverride = null;
-  let currentLogged   = false;
-  let sessionLog      = [];
+  // ── STATE ──────────────────────────────────────────────────────────────────
+  let currentResult    = null;
+  let currentOverride  = null;
+  let currentLogged    = false;
+  let sessionLog       = [];
   let activeConditions = [];
-  let chatHistory     = [];
-  let revisedResult   = null; // populated after regeneration
+  let chatHistory      = [];
+  let revisedResult    = null;
+  let considerations   = [];
+  let nextSteps        = [];
 
   // ── INIT ───────────────────────────────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
@@ -744,104 +570,55 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
   });
 
   // ── KEY MANAGEMENT ─────────────────────────────────────────────────────────
-  function showKeyScreen() {
-    document.getElementById("keyScreen").style.display = "flex";
-    document.getElementById("appScreen").style.display = "none";
-  }
-  function showApp() {
-    document.getElementById("keyScreen").style.display = "none";
-    document.getElementById("appScreen").style.display = "flex";
-  }
+  function showKeyScreen() { document.getElementById("keyScreen").style.display = "flex"; document.getElementById("appScreen").style.display = "none"; }
+  function showApp()       { document.getElementById("keyScreen").style.display = "none"; document.getElementById("appScreen").style.display = "flex"; }
   function updateKeyIndicator() {
     const has = !!localStorage.getItem("anthropic_key");
-    document.getElementById("keyDot").className = "key-dot " + (has ? "set" : "unset");
+    document.getElementById("keyDot").className   = "key-dot " + (has ? "set" : "unset");
     document.getElementById("keyLabel").textContent = has ? "Key set" : "No key";
   }
   function validateKey(val) {
-    if (!val || !val.startsWith("sk-ant-")) {
-      alert("That doesn't look like an Anthropic API key — it should start with sk-ant-");
-      return false;
-    }
+    if (!val || !val.startsWith("sk-ant-")) { alert("That doesn't look like an Anthropic API key — it should start with sk-ant-"); return false; }
     return true;
   }
-  function saveKey() {
-    const val = document.getElementById("keyInput").value.trim();
-    if (!validateKey(val)) return;
-    localStorage.setItem("anthropic_key", val);
-    updateKeyIndicator();
-    showApp();
-  }
-  function openKeyModal() {
-    document.getElementById("keyModalInput").value = localStorage.getItem("anthropic_key") || "";
-    document.getElementById("keyModal").style.display = "flex";
-  }
-  function closeKeyModal()         { document.getElementById("keyModal").style.display = "none"; }
-  function closeModalOutside(e)    { if (e.target.id === "keyModal") closeKeyModal(); }
-  function updateKey() {
-    const val = document.getElementById("keyModalInput").value.trim();
-    if (!validateKey(val)) return;
-    localStorage.setItem("anthropic_key", val);
-    updateKeyIndicator();
-    closeKeyModal();
-  }
-  function clearKey() {
-    if (!confirm("Clear saved API key? You'll need to re-enter it next time.")) return;
-    localStorage.removeItem("anthropic_key");
-    updateKeyIndicator();
-    closeKeyModal();
-    showKeyScreen();
-  }
+  function saveKey() { const v = document.getElementById("keyInput").value.trim(); if (!validateKey(v)) return; localStorage.setItem("anthropic_key", v); updateKeyIndicator(); showApp(); }
+  function openKeyModal()    { document.getElementById("keyModalInput").value = localStorage.getItem("anthropic_key") || ""; document.getElementById("keyModal").style.display = "flex"; }
+  function closeKeyModal()   { document.getElementById("keyModal").style.display = "none"; }
+  function closeModalOutside(e) { if (e.target.id === "keyModal") closeKeyModal(); }
+  function updateKey()  { const v = document.getElementById("keyModalInput").value.trim(); if (!validateKey(v)) return; localStorage.setItem("anthropic_key", v); updateKeyIndicator(); closeKeyModal(); }
+  function clearKey()   { if (!confirm("Clear saved API key?")) return; localStorage.removeItem("anthropic_key"); updateKeyIndicator(); closeKeyModal(); showKeyScreen(); }
 
-  // ── ASSESSMENT ─────────────────────────────────────────────────────────────
+  // ── ASSESS ─────────────────────────────────────────────────────────────────
   async function assessBrief() {
     const text  = document.getElementById("briefInput").value.trim();
     const errEl = document.getElementById("inputError");
     errEl.style.display = "none";
     if (!text) return;
-
     const key = localStorage.getItem("anthropic_key");
     if (!key) { openKeyModal(); return; }
 
     const btn = document.getElementById("assessBtn");
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner">⟳</span>&nbsp;Assessing...';
+    btn.disabled = true; btn.innerHTML = '<span class="spinner">⟳</span>&nbsp;Assessing…';
 
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": key,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true"
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: SYSTEM_PROMPT,
-          messages: [{ role: "user", content: "Please assess the following ACO brief:\n\n" + text }]
-        })
+        headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 2000, system: SYSTEM_PROMPT, messages: [{ role: "user", content: "Assess this ACO brief:\n\n" + text }] })
       });
-
-      if (!res.ok) {
-        const e = await res.json().catch(() => ({}));
-        throw new Error(e?.error?.message || "API error " + res.status);
-      }
-
+      if (!res.ok) { const e = await res.json().catch(()=>{}); throw new Error(e?.error?.message || "API error " + res.status); }
       const data   = await res.json();
       const raw    = (data.content || []).map(c => c.text || "").join("");
       const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-      currentResult   = parsed;
-      currentOverride = null;
-      currentLogged   = false;
+      currentResult = parsed; currentOverride = null; currentLogged = false;
+      activeConditions = [...(parsed.conditions || [])];
+      considerations = []; nextSteps = [];
       renderResults(parsed);
-
-    } catch (err) {
+    } catch(err) {
       errEl.textContent = err.message || "Assessment failed. Check your API key and try again.";
       errEl.style.display = "inline";
     } finally {
-      btn.disabled = false;
-      btn.innerHTML = "Assess Brief";
+      btn.disabled = false; btn.innerHTML = "Assess Brief";
     }
   }
 
@@ -851,128 +628,109 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     document.getElementById("resultsPanel").style.display = "block";
     document.getElementById("newBriefBtn").style.display  = "flex";
 
+    // Title
     const title = r.brief_title || "Brief Assessment";
     const words = title.split(" ");
-    const titleEl = document.getElementById("resultTitle");
-    titleEl.innerHTML = words.length > 1
-      ? `<span class="brief-title-green">${words[0]}</span> ${words.slice(1).join(" ")}`
-      : title;
+    document.getElementById("resultTitle").innerHTML = words.length > 1
+      ? `<span class="brief-title-green">${words[0]}</span> ${words.slice(1).join(" ")}` : title;
     document.getElementById("resultSummary").textContent = r.brief_summary || "";
 
-    const grid = document.getElementById("dimsGrid");
-    grid.innerHTML = "";
-    DIMENSIONS.forEach(dim => {
-      const d  = r.dimensions?.[dim.id] || {};
-      const el = document.createElement("div");
-      el.className = "dim-card rag-" + (d.rating || "amber");
-
-      // Findings: gaps get warning styling, colour by severity; non-green get a promote (+) button
-      const findingClass = d.rating === "red" ? "finding-red" : d.rating === "green" ? "finding-ok" : "finding-gap";
-      const findingIcon  = d.rating === "red" ? "✕" : d.rating === "green" ? "✓" : "!";
-      const canPromote   = d.rating !== "green";
-      const findingsHtml = (d.gaps?.length)
-        ? `<div class="dim-findings">${d.gaps.map((g, gi) =>
-            `<div class="dim-finding ${findingClass}" data-dim="${dim.id}" data-gap="${gi}">
-              <span class="dim-finding-icon">${findingIcon}</span>
-              <span>${g}</span>
-              ${canPromote ? `<button class="finding-promote" title="Add to conditions" onclick="promoteGap(this, '${g.replace(/'/g,"\\'")}')">+</button>` : ""}
-            </div>`).join("")}</div>`
-        : "";
-
-      el.innerHTML =
-        `<div class="dim-header">
-          <div class="dim-name">${dim.label}</div>
-          ${ragBadge(d.rating)}
+    // Tactics
+    const tacticList = document.getElementById("tacticList");
+    tacticList.innerHTML = "";
+    (r.tactics || []).forEach(t => {
+      const canClass    = t.can_deliver    === "yes" ? "yes" : t.can_deliver    === "no" ? "no" : "qn";
+      const shouldClass = t.should_deliver === "yes" ? "yes" : t.should_deliver === "no" ? "no" : "qn";
+      const canLabel    = t.can_deliver    === "yes" ? "Can deliver" : t.can_deliver    === "no" ? "Can't deliver" : "Can deliver?";
+      const shouldLabel = t.should_deliver === "yes" ? "Should deliver" : t.should_deliver === "no" ? "Skip" : "Worth it?";
+      const item = document.createElement("div");
+      item.className = "tactic-item";
+      item.innerHTML =
+        `<div class="tactic-header">
+          <span class="tactic-label">${t.label}</span>
+          <div class="tactic-pills">
+            <span class="tactic-pill ${canClass}">${canLabel}</span>
+            <span class="tactic-pill ${shouldClass}">${shouldLabel}</span>
+          </div>
+          <button class="tactic-toggle" onclick="toggleVerbatim(this)">brief text</button>
         </div>` +
-        (d.summary ? `<div class="dim-verdict">${d.summary}</div>` : "") +
-        findingsHtml;
-      grid.appendChild(el);
+        (t.note ? `<div class="tactic-verbatim" style="display:none; color:var(--muted); font-style:italic;">${esc(t.note)}<br><br><span style="color:var(--muted);">${esc(t.verbatim)}</span></div>`
+                : `<div class="tactic-verbatim" style="display:none;">${esc(t.verbatim)}</div>`);
+      tacticList.appendChild(item);
     });
 
+    // RAG strip + flags
+    const strip = document.getElementById("ragStrip");
+    const flagsList = document.getElementById("flagsList");
+    strip.innerHTML = ""; flagsList.innerHTML = "";
+    let hasFlags = false;
+    DIMENSIONS.forEach(dim => {
+      const d = r.dimensions?.[dim.id] || {};
+      const chip = document.createElement("div");
+      chip.className = `rag-chip ${d.rating || "amber"}`;
+      chip.innerHTML = `<div class="rag-chip-dot"></div>${dim.label}`;
+      chip.title = d.summary || "";
+      strip.appendChild(chip);
+      if (d.rating !== "green" && (d.summary || d.flags?.length)) {
+        hasFlags = true;
+        if (d.summary) {
+          const flag = document.createElement("div");
+          flag.className = `flag-item ${d.rating || "amber"}`;
+          flag.innerHTML = `<span class="flag-dim">${dim.label}</span><span>${esc(d.summary)}${(d.flags||[]).map(f=>`<br><small>&#9656; ${esc(f)}</small>`).join("")}</span>`;
+          flagsList.appendChild(flag);
+        }
+      }
+    });
+    if (!hasFlags) { const ok = document.createElement("div"); ok.style.cssText="font-size:12px;color:var(--cos-green-access);"; ok.textContent="No significant issues flagged."; flagsList.appendChild(ok); }
+
+    // Questions
     const qs = r.key_questions || [];
     const qPanel = document.getElementById("questionsPanel");
     if (qs.length) {
-      document.getElementById("questionsList").innerHTML = qs.map((q, i) =>
-        `<div class="question-item"><span class="question-num">${i+1}.</span><span>${q}</span></div>`
+      document.getElementById("questionsList").innerHTML = qs.map((q,i) =>
+        `<div class="question-item"><span class="question-num">${i+1}.</span><span>${esc(q)}</span></div>`
       ).join("");
       qPanel.style.display = "block";
-    } else {
-      qPanel.style.display = "none";
-    }
+    } else { qPanel.style.display = "none"; }
 
+    // Recommendation
     applyRecBadge(r.recommendation);
     document.getElementById("recRationale").textContent = r.recommendation_rationale || "";
-
-    // Seed active conditions from AI result
-    activeConditions = [...(r.conditions || [])];
     renderConditions();
 
+    // Override buttons
     const row = document.getElementById("overrideRow");
     row.innerHTML = "";
     REC_OPTIONS.forEach(opt => {
       const isActive = opt.value === r.recommendation;
       const btn = document.createElement("button");
-      btn.className     = "override-btn" + (isActive ? " active" : "");
-      btn.style.color   = opt.color;
-      btn.style.borderColor = opt.color + "55";
-      btn.style.background  = isActive ? opt.bg : "var(--bg)";
-      btn.textContent   = opt.label;
-      btn.onclick       = () => setOverride(opt.value);
+      btn.className = "override-btn" + (isActive ? " active" : "");
+      btn.style.color = opt.color; btn.style.borderColor = opt.color + "55";
+      btn.style.background = isActive ? opt.bg : "var(--bg)";
+      btn.textContent = opt.label;
+      btn.onclick = () => setOverride(opt.value);
       row.appendChild(btn);
     });
 
-    document.getElementById("logBtn").disabled    = false;
+    // Determination form
+    renderBullets("consideration");
+    renderBullets("nextStep");
+    document.getElementById("logBtn").disabled = false;
     document.getElementById("logBtn").textContent = "Log decision";
-    document.getElementById("meetingNotes").value = "";
+    document.getElementById("assessAnotherBtn").style.display = "none";
   }
 
-  function renderConditions() {
-    const condBlock = document.getElementById("conditionsBlock");
-    const condList  = document.getElementById("conditionsList");
-    if (!activeConditions.length) {
-      condBlock.style.display = "none";
-      return;
-    }
-    condBlock.style.display = "block";
-    condList.innerHTML = activeConditions.map((c, i) =>
-      `<div class="condition-item">
-        <span>${c}</span>
-        <button class="condition-remove" title="Remove condition" onclick="removeCondition(${i})">−</button>
-      </div>`
-    ).join("");
-  }
-
-  function removeCondition(index) {
-    activeConditions.splice(index, 1);
-    renderConditions();
-  }
-
-  function promoteGap(btn, text) {
-    // Avoid duplicates
-    if (activeConditions.includes(text)) return;
-    activeConditions.push(text);
-    renderConditions();
-    // Visual feedback on the finding — disable the button
-    btn.textContent = "✓";
-    btn.disabled = true;
-    btn.style.opacity = "0.4";
-    btn.title = "Added to conditions";
-    // Scroll conditions into view
-    document.getElementById("conditionsBlock").scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }
-
-  function ragBadge(rating) {
-    const map = { green: ["rag-green","Green"], amber: ["rag-amber","Amber"], red: ["rag-red","Red"] };
-    const [cls, label] = map[rating] || ["rag-amber","—"];
-    return `<span class="rag ${cls}">${label}</span>`;
+  function toggleVerbatim(btn) {
+    const v = btn.closest(".tactic-item").querySelector(".tactic-verbatim");
+    const open = v.style.display !== "none";
+    v.style.display = open ? "none" : "block";
+    btn.textContent = open ? "brief text" : "hide";
   }
 
   function applyRecBadge(value) {
-    const opt   = REC_OPTIONS.find(r => r.value === value) || REC_OPTIONS[0];
+    const opt = REC_OPTIONS.find(r => r.value === value) || REC_OPTIONS[0];
     const badge = document.getElementById("recBadge");
-    badge.textContent      = opt.label;
-    badge.style.background = opt.color;
-    badge.style.color      = "#fff";
+    badge.textContent = opt.label; badge.style.background = opt.color; badge.style.color = "#fff";
   }
 
   function setOverride(value) {
@@ -981,604 +739,429 @@ Respond ONLY with valid JSON. No markdown, no preamble, no text outside the JSON
     const effective = currentOverride || aiRec;
     applyRecBadge(effective);
     document.getElementById("overrideRow").querySelectorAll(".override-btn").forEach(btn => {
-      const opt    = REC_OPTIONS.find(o => o.label === btn.textContent);
+      const opt = REC_OPTIONS.find(o => o.label === btn.textContent);
       const active = opt?.value === effective;
       btn.classList.toggle("active", active);
       btn.style.background = active ? opt.bg : "var(--bg)";
     });
   }
 
+  // ── CONDITIONS ─────────────────────────────────────────────────────────────
+  function renderConditions() {
+    const block = document.getElementById("conditionsBlock");
+    const list  = document.getElementById("conditionsList");
+    if (!activeConditions.length) { block.style.display = "none"; return; }
+    block.style.display = "block";
+    list.innerHTML = activeConditions.map((c,i) =>
+      `<div class="condition-item">
+        <span>${esc(c)}</span>
+        <button class="condition-remove" onclick="removeCondition(${i})">−</button>
+      </div>`
+    ).join("");
+  }
+  function removeCondition(i)   { activeConditions.splice(i,1); renderConditions(); }
+  function promoteGap(btn, text) {
+    if (activeConditions.includes(text)) return;
+    activeConditions.push(text);
+    renderConditions();
+    btn.textContent = "✓"; btn.disabled = true; btn.style.opacity = "0.4";
+  }
+
+  // ── DETERMINATION BULLETS ──────────────────────────────────────────────────
+  function handleBulletKey(e, type) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addBullet(type); }
+  }
+  function addBullet(type) {
+    const inputId = type === "consideration" ? "considerationInput" : "nextStepInput";
+    const input   = document.getElementById(inputId);
+    const text    = input.value.trim();
+    if (!text) return;
+    if (type === "consideration") considerations.push(text);
+    else nextSteps.push(text);
+    input.value = "";
+    renderBullets(type);
+    input.focus();
+  }
+  function removeBullet(type, i) {
+    if (type === "consideration") considerations.splice(i,1);
+    else nextSteps.splice(i,1);
+    renderBullets(type);
+  }
+  function renderBullets(type) {
+    const listId = type === "consideration" ? "considerationsList" : "nextStepsList";
+    const items  = type === "consideration" ? considerations : nextSteps;
+    document.getElementById(listId).innerHTML = items.map((t,i) =>
+      `<div class="bullet-entry">
+        <span class="bullet-entry-dot">•</span>
+        <span class="bullet-entry-text">${esc(t)}</span>
+        <button class="bullet-remove" onclick="removeBullet('${type}',${i})">×</button>
+      </div>`
+    ).join("");
+  }
+
   // ── LOG ────────────────────────────────────────────────────────────────────
   function logDecision() {
     if (!currentResult || currentLogged) return;
-    const r = currentResult;
+    const r   = currentResult;
     const rec = currentOverride || r.recommendation;
-
-    // Capture full assessment detail for export
     sessionLog.push({
-      index:          sessionLog.length + 1,
-      title:          r.brief_title || "Untitled Brief",
-      summary:        r.brief_summary || "",
-      recommendation: rec,
-      rationale:      r.recommendation_rationale || "",
-      conditions:     [...activeConditions],
-      questions:      r.key_questions || [],
-      dimensions:     r.dimensions || {},
-      notes:          document.getElementById("meetingNotes").value.trim(),
-      time:           new Date().toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" }),
-      date:           new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" }),
-      revised:        revisedResult ? {
-        recommendation: revisedResult.recommendation,
-        rationale:      revisedResult.recommendation_rationale,
-        conditions:     revisedResult.conditions || [],
-        whatChanged:    revisedResult.what_changed || ""
-      } : null,
-      overridden:     !!currentOverride && currentOverride !== r.recommendation,
-      aiRecommendation: r.recommendation
+      index:            sessionLog.length + 1,
+      title:            r.brief_title || "Untitled Brief",
+      summary:          r.brief_summary || "",
+      recommendation:   rec,
+      rationale:        r.recommendation_rationale || "",
+      conditions:       [...activeConditions],
+      considerations:   [...considerations],
+      nextSteps:        [...nextSteps],
+      tactics:          r.tactics || [],
+      dimensions:       r.dimensions || {},
+      questions:        r.key_questions || [],
+      revised:          revisedResult ? { recommendation: revisedResult.recommendation, rationale: revisedResult.recommendation_rationale, conditions: revisedResult.conditions || [], whatChanged: revisedResult.what_changed || "" } : null,
+      overridden:       !!currentOverride && currentOverride !== r.recommendation,
+      aiRecommendation: r.recommendation,
+      time:             new Date().toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" }),
+      date:             new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" }),
     });
-
     currentLogged = true;
-    const btn = document.getElementById("logBtn");
-    btn.disabled    = true;
-    btn.textContent = "Logged ✓";
+    document.getElementById("logBtn").disabled    = true;
+    document.getElementById("logBtn").textContent = "Logged ✓";
     document.getElementById("assessAnotherBtn").style.display = "inline-flex";
     renderLog();
   }
 
   function renderLog() {
-    const empty    = document.getElementById("logEmpty");
-    const list     = document.getElementById("logList");
-    const count    = document.getElementById("logCount");
-    const footer   = document.getElementById("logFooter");
-    const logBody  = document.getElementById("logBody");
-
     const n = sessionLog.length;
-    count.textContent = n === 1 ? "1 decision logged" : `${n} decisions logged`;
-
-    if (!n) {
-      empty.style.display = "flex";
-      list.innerHTML = "";
-      footer.style.display = "none";
-      return;
-    }
-
-    empty.style.display = "none";
-    footer.style.display = "block";
-
-    list.innerHTML = sessionLog.map(e => {
+    document.getElementById("logCount").textContent = n === 1 ? "1 decision logged" : `${n} decisions logged`;
+    if (!n) { document.getElementById("logEmpty").style.display = "flex"; document.getElementById("logList").innerHTML = ""; document.getElementById("logFooter").style.display = "none"; return; }
+    document.getElementById("logEmpty").style.display = "none";
+    document.getElementById("logFooter").style.display = "block";
+    document.getElementById("logList").innerHTML = sessionLog.map(e => {
       const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
-      const overrideNote = e.overridden
-        ? `<div style="font-size:10px; color:rgba(255,255,255,0.3); margin-top:3px;">Override from: ${REC_OPTIONS.find(r=>r.value===e.aiRecommendation)?.label || e.aiRecommendation}</div>`
-        : "";
+      const finalOpt = e.revised ? (REC_OPTIONS.find(r => r.value === e.revised.recommendation) || opt) : opt;
       return `<div class="log-entry">
         <div class="log-entry-top">
-          <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
-              <span class="log-entry-num">#${e.index}</span>
-              <span class="rec-badge" style="background:${opt?.color}; font-size:10px; padding:2px 8px;">${opt?.label}</span>
-            </div>
-            <div class="log-entry-title">${e.title}</div>
-          </div>
+          <span class="log-entry-num">#${e.index}</span>
+          <span class="log-badge" style="background:${finalOpt?.color}">${finalOpt?.label}</span>
+          ${e.revised ? `<span style="font-size:10px;color:rgba(255,255,255,0.35);font-style:italic;">revised</span>` : ""}
         </div>
+        <div class="log-entry-title">${e.title}</div>
         <div class="log-entry-time">${e.time}</div>
-        ${overrideNote}
-        ${e.notes ? `<div class="log-entry-notes">${e.notes}</div>` : ""}
+        ${e.considerations?.length ? `<div class="log-entry-notes">${e.considerations.length} consideration${e.considerations.length!==1?"s":""}</div>` : ""}
       </div>`;
     }).join("");
-
-    // Scroll to bottom of log
-    logBody.scrollTop = logBody.scrollHeight;
+    document.getElementById("logBody").scrollTop = document.getElementById("logBody").scrollHeight;
   }
 
   // ── SUMMARY MODAL ──────────────────────────────────────────────────────────
   function openSummaryModal() {
     if (!sessionLog.length) return;
     document.getElementById("summaryRendered").innerHTML = buildSummaryHTML();
-    document.getElementById("copyBtn").textContent = "Copy to clipboard";
-    document.getElementById("copyBtn").innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Copy to clipboard`;
     document.getElementById("summaryModal").style.display = "flex";
   }
-
-  function closeSummaryModal() { document.getElementById("summaryModal").style.display = "none"; }
-  function closeSummaryOutside(e) { if (e.target.id === "summaryModal") closeSummaryModal(); }
+  function closeSummaryModal()     { document.getElementById("summaryModal").style.display = "none"; }
+  function closeSummaryOutside(e)  { if (e.target.id === "summaryModal") closeSummaryModal(); }
 
   function buildSummaryHTML() {
-    const date = new Date().toLocaleDateString("en-AU", {
-      weekday: "long", day: "numeric", month: "long", year: "numeric"
-    });
-    const dimLabels = {
-      problem_clarity:      "Problem Clarity",
-      proportionality:      "Proportionality",
-      resourcing_realism:   "Resourcing Realism",
-      efficiency_potential: "Efficiency Potential",
-      brief_completeness:   "Brief Completeness",
-      risk_sensitivity:     "Risk & Sensitivity",
-    };
+    const date = new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    let html = `<p style="font-size:12px;color:var(--muted);margin-bottom:14px;"><strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Briefs assessed:</strong> ${sessionLog.length}</p>`;
 
-    let html = `<p><strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Briefs assessed:</strong> ${sessionLog.length}</p>`;
-
-    // ── DECISIONS AT A GLANCE ──────────────────────────────────────────────
-    html += `<div style="background:var(--cos-deep-blue); border-radius:4px; padding:18px 20px; margin:14px 0 20px;">`;
-    html += `<div style="font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--cos-green); margin-bottom:12px;">Decisions at a glance</div>`;
+    // Decisions panel
+    html += `<div class="decisions-panel">`;
+    html += `<div class="decisions-panel-label">Decisions</div>`;
     sessionLog.forEach(e => {
-      const opt        = REC_OPTIONS.find(r => r.value === e.recommendation);
-      const finalRec   = e.revised ? (REC_OPTIONS.find(r => r.value === e.revised.recommendation) || opt) : opt;
-      const rationale  = e.revised ? e.revised.recommendation_rationale : e.rationale;
-      const conditions = e.revised?.conditions?.length ? e.revised.conditions : (e.conditions || []);
-      html += `<div style="border-bottom:1px solid rgba(255,255,255,0.08); padding:10px 0; last-child:border-none;">`;
-      html += `<div style="display:flex; align-items:center; gap:10px; margin-bottom:5px; flex-wrap:wrap;">`;
-      html += `<span style="font-size:13px; font-weight:700; color:#fff;">${e.title}</span>`;
-      html += `<span style="display:inline-block; padding:2px 10px; border-radius:2px; font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; background:${finalRec?.color}; color:#fff;">${finalRec?.label}</span>`;
-      if (e.revised) html += `<span style="font-size:10px; color:rgba(255,255,255,0.4); font-style:italic;">revised after discussion</span>`;
+      const opt      = REC_OPTIONS.find(r => r.value === e.recommendation);
+      const finalOpt = e.revised ? (REC_OPTIONS.find(r => r.value === e.revised.recommendation) || opt) : opt;
+      const rationale    = e.revised ? e.revised.rationale : e.rationale;
+      const finalConds   = e.revised?.conditions?.length ? e.revised.conditions : e.conditions;
+      html += `<div class="decision-entry">`;
+      html += `<div class="decision-entry-top">`;
+      html += `<span class="decision-title">${e.title}</span>`;
+      html += `<span class="log-badge" style="background:${finalOpt?.color}">${finalOpt?.label}</span>`;
+      if (e.revised) html += `<span style="font-size:10px;color:rgba(255,255,255,0.4);font-style:italic;">revised after discussion</span>`;
       html += `</div>`;
-      html += `<p style="font-size:12px; color:rgba(255,255,255,0.65); margin:0 0 5px; line-height:1.5;">${rationale}</p>`;
-      if (conditions.length) {
-        html += `<ul style="margin:4px 0 0 16px; padding:0;">`;
-        conditions.forEach(c => { html += `<li style="font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:2px;">${c}</li>`; });
+      if (e.considerations?.length) {
+        html += `<ul style="margin:5px 0 5px 16px;">`;
+        e.considerations.forEach(c => { html += `<li style="font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:2px;">${esc(c)}</li>`; });
+        html += `</ul>`;
+      }
+      if (e.nextSteps?.length) {
+        html += `<div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.08em;margin:5px 0 3px;">Next steps</div>`;
+        html += `<ul style="margin:0 0 0 16px;">`;
+        e.nextSteps.forEach(s => { html += `<li style="font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:2px;">${esc(s)}</li>`; });
+        html += `</ul>`;
+      }
+      if (finalConds?.length) {
+        html += `<div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.08em;margin:5px 0 3px;">Conditions</div>`;
+        html += `<ul style="margin:0 0 0 16px;">`;
+        finalConds.forEach(c => { html += `<li style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:2px;">${esc(c)}</li>`; });
         html += `</ul>`;
       }
       html += `</div>`;
     });
     html += `</div>`;
 
-    // ── DETAILED BREAKDOWN ─────────────────────────────────────────────────
-    html += `<h2 style="font-size:13px; color:var(--muted); font-weight:700; letter-spacing:0.08em; text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px;">Full assessment detail</h2>`;
-
-    sessionLog.forEach((e, i) => {
+    // Detail
+    html += `<h2 style="font-size:11px;border-bottom-color:var(--border);">Full assessment detail</h2>`;
+    sessionLog.forEach((e,i) => {
       const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
-      html += `${i > 0 ? "<hr>" : ""}`;
+      if (i > 0) html += `<hr>`;
       html += `<h2>${e.index}. ${e.title}</h2>`;
-      html += `<p><strong>Decision:</strong> ${opt?.label || e.recommendation}`;
-      if (e.overridden) {
-        const aiOpt = REC_OPTIONS.find(r => r.value === e.aiRecommendation);
-        html += ` <em>(overridden — AI recommended: ${aiOpt?.label || e.aiRecommendation})</em>`;
-      }
-      html += ` &nbsp;<strong>Time:</strong> ${e.time}</p>`;
-
+      html += `<p><strong>AI recommendation:</strong> ${opt?.label} &nbsp;·&nbsp; <strong>Time:</strong> ${e.time}</p>`;
       if (e.summary) html += `<p>${e.summary}</p>`;
-
-      html += `<h3>Assessment rationale</h3><p>${e.rationale}</p>`;
-
+      html += `<p>${e.rationale}</p>`;
       if (e.revised) {
-        const revOpt = REC_OPTIONS.find(r => r.value === e.revised.recommendation);
-        html += `<h3 style="color:var(--cos-blue);">↻ Revised after discussion</h3>`;
+        const rOpt = REC_OPTIONS.find(r => r.value === e.revised.recommendation);
+        html += `<h3>Revised after discussion</h3>`;
         if (e.revised.whatChanged) html += `<p><em>${e.revised.whatChanged}</em></p>`;
-        html += `<p><strong>Revised decision:</strong> ${revOpt?.label || e.revised.recommendation}</p>`;
-        html += `<p>${e.revised.rationale}</p>`;
-        if (e.revised.conditions?.length) {
-          html += `<p><strong>Updated conditions:</strong></p><ul>`;
-          e.revised.conditions.forEach(c => { html += `<li>${c}</li>`; });
-          html += `</ul>`;
-        }
+        html += `<p><strong>${rOpt?.label}</strong> — ${e.revised.rationale}</p>`;
       }
-
-      if (e.conditions?.length) {
-        html += `<h3>Conditions / actions required</h3><ul>`;
-        e.conditions.forEach(c => { html += `<li>${c}</li>`; });
-        html += `</ul>`;
+      if (e.tactics?.length) {
+        html += `<h3>Tactic assessment</h3>`;
+        html += `<table><thead><tr><th>Tactic</th><th>Can deliver</th><th>Should deliver</th></tr></thead><tbody>`;
+        e.tactics.forEach(t => {
+          html += `<tr><td>${esc(t.label)}</td><td>${t.can_deliver}</td><td>${t.should_deliver}${t.note ? ` — ${esc(t.note)}` : ""}</td></tr>`;
+        });
+        html += `</tbody></table>`;
       }
-
-      html += `<h3>Dimension assessments</h3>`;
-      html += `<table><thead><tr><th>Dimension</th><th>Rating</th><th>Assessment</th></tr></thead><tbody>`;
+      const dimLabels = { problem_clarity:"Problem Clarity", proportionality:"Proportionality", resourcing_realism:"Resourcing Realism", efficiency_potential:"Efficiency Potential", brief_completeness:"Brief Completeness", risk_sensitivity:"Risk & Sensitivity" };
+      html += `<h3>Dimension ratings</h3>`;
+      html += `<table><thead><tr><th>Dimension</th><th>Rating</th><th>Note</th></tr></thead><tbody>`;
       Object.entries(dimLabels).forEach(([id, label]) => {
-        const d      = e.dimensions?.[id] || {};
-        const rating = d.rating || "amber";
-        const rLabel = rating.charAt(0).toUpperCase() + rating.slice(1);
-        const gaps   = (d.gaps || []).map(g => `<br><small>&#9656; ${g}</small>`).join("");
-        html += `<tr>
-          <td><strong>${label}</strong></td>
-          <td class="rating-${rating}">${rLabel}</td>
-          <td>${d.summary || "—"}${gaps}</td>
-        </tr>`;
+        const d = e.dimensions?.[id] || {};
+        html += `<tr><td>${label}</td><td>${(d.rating||"—").charAt(0).toUpperCase()+(d.rating||"").slice(1)}</td><td>${esc(d.summary||"—")}</td></tr>`;
       });
       html += `</tbody></table>`;
-
-      if (e.questions?.length) {
-        html += `<h3>Questions raised in meeting</h3><ul>`;
-        e.questions.forEach(q => { html += `<li>${q}</li>`; });
-        html += `</ul>`;
-      }
-
-      if (e.notes) html += `<h3>Meeting notes</h3><p>${e.notes}</p>`;
     });
-
     return html;
   }
 
-  function buildSummaryMarkdown() {
-    const date = new Date().toLocaleDateString("en-AU", {
-      weekday: "long", day: "numeric", month: "long", year: "numeric"
-    });
-    const dimLabels = {
-      problem_clarity:      "Problem Clarity",
-      proportionality:      "Proportionality",
-      resourcing_realism:   "Resourcing Realism",
-      efficiency_potential: "Efficiency Potential",
-      brief_completeness:   "Brief Completeness",
-      risk_sensitivity:     "Risk & Sensitivity",
-    };
-
-    let md = `## Brief Assessment — Session Log\n\n`;
-    md    += `**Date:** ${date}  \n**Briefs assessed:** ${sessionLog.length}\n\n`;
-
-    // ── DECISIONS AT A GLANCE ──────────────────────────────────────────────
-    md += `## Decisions at a glance\n\n`;
+  function buildDecisionsMarkdown() {
+    const date = new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    let md = `## Brief Assessment — ${date}\n\n`;
     sessionLog.forEach(e => {
-      const opt       = REC_OPTIONS.find(r => r.value === e.recommendation);
-      const finalOpt  = e.revised ? (REC_OPTIONS.find(r => r.value === e.revised.recommendation) || opt) : opt;
-      const rationale = e.revised ? e.revised.recommendation_rationale : e.rationale;
-      const conditions = e.revised?.conditions?.length ? e.revised.conditions : (e.conditions || []);
-      md += `**${e.title}** — ${finalOpt?.label || e.recommendation}`;
+      const opt      = REC_OPTIONS.find(r => r.value === e.recommendation);
+      const finalOpt = e.revised ? (REC_OPTIONS.find(r => r.value === e.revised.recommendation) || opt) : opt;
+      const finalConds = e.revised?.conditions?.length ? e.revised.conditions : e.conditions;
+      md += `### ${e.title}\n`;
+      md += `**${finalOpt?.label}**`;
       if (e.revised) md += ` *(revised after discussion)*`;
-      md += `\n${rationale}\n`;
-      if (conditions.length) {
-        conditions.forEach(c => { md += `- ${c}\n`; });
+      md += `\n\n`;
+      if (e.considerations?.length) {
+        md += `**Key considerations**\n`;
+        e.considerations.forEach(c => { md += `- ${c}\n`; });
+        md += `\n`;
       }
-      md += `\n`;
+      if (e.nextSteps?.length) {
+        md += `**Next steps**\n`;
+        e.nextSteps.forEach(s => { md += `- ${s}\n`; });
+        md += `\n`;
+      }
+      if (finalConds?.length) {
+        md += `**Conditions**\n`;
+        finalConds.forEach(c => { md += `- ${c}\n`; });
+        md += `\n`;
+      }
     });
+    return md;
+  }
 
+  function buildFullMarkdown() {
+    const dimLabels = { problem_clarity:"Problem Clarity", proportionality:"Proportionality", resourcing_realism:"Resourcing Realism", efficiency_potential:"Efficiency Potential", brief_completeness:"Brief Completeness", risk_sensitivity:"Risk & Sensitivity" };
+    let md = buildDecisionsMarkdown();
     md += `---\n\n## Full assessment detail\n\n`;
-
-    sessionLog.forEach((e, i) => {
+    sessionLog.forEach((e,i) => {
       const opt = REC_OPTIONS.find(r => r.value === e.recommendation);
       if (i > 0) md += `---\n\n`;
       md += `### ${e.index}. ${e.title}\n\n`;
-      md += `**Decision:** ${opt?.label || e.recommendation}`;
-      if (e.overridden) {
-        const aiOpt = REC_OPTIONS.find(r => r.value === e.aiRecommendation);
-        md += ` *(overridden — AI recommended: ${aiOpt?.label || e.aiRecommendation})*`;
-      }
-      md += `  \n**Time:** ${e.time}\n\n`;
+      md += `**AI recommendation:** ${opt?.label}  \n**Time:** ${e.time}\n\n`;
       if (e.summary) md += `${e.summary}\n\n`;
-      md += `**Assessment rationale:** ${e.rationale}\n\n`;
-
+      md += `${e.rationale}\n\n`;
       if (e.revised) {
-        const revOpt = REC_OPTIONS.find(r => r.value === e.revised.recommendation);
-        md += `**Revised after discussion**\n\n`;
+        const rOpt = REC_OPTIONS.find(r => r.value === e.revised.recommendation);
+        md += `**Revised after discussion**\n`;
         if (e.revised.whatChanged) md += `*${e.revised.whatChanged}*\n\n`;
-        md += `**Revised decision:** ${revOpt?.label || e.revised.recommendation}  \n`;
-        md += `${e.revised.rationale}\n\n`;
-        if (e.revised.conditions?.length) {
-          md += `**Updated conditions:**\n`;
-          e.revised.conditions.forEach(c => { md += `- ${c}\n`; });
-          md += `\n`;
-        }
+        md += `**${rOpt?.label}** — ${e.revised.rationale}\n\n`;
       }
-
-      if (e.conditions?.length) {
-        md += `**Conditions / actions required:**\n`;
-        e.conditions.forEach(c => { md += `- ${c}\n`; });
+      if (e.tactics?.length) {
+        md += `**Tactic assessment:**\n| Tactic | Can deliver | Should deliver |\n|--------|-------------|----------------|\n`;
+        e.tactics.forEach(t => { md += `| ${t.label} | ${t.can_deliver} | ${t.should_deliver}${t.note ? ` — ${t.note}` : ""} |\n`; });
         md += `\n`;
       }
-
-      md += `**Dimension assessments:**\n\n`;
-      md += `| Dimension | Rating | Assessment |\n|-----------|--------|------------|\n`;
+      md += `**Dimension ratings:**\n| Dimension | Rating | Note |\n|-----------|--------|------|\n`;
       Object.entries(dimLabels).forEach(([id, label]) => {
-        const d      = e.dimensions?.[id] || {};
-        const rating = d.rating ? d.rating.charAt(0).toUpperCase() + d.rating.slice(1) : "—";
-        const summary = (d.summary || "—").replace(/\|/g, "\\|");
-        md += `| ${label} | ${rating} | ${summary} |\n`;
+        const d = e.dimensions?.[id] || {};
+        md += `| ${label} | ${(d.rating||"—")} | ${(d.summary||"—").replace(/\|/g,"\\|")} |\n`;
       });
       md += `\n`;
-
-      if (e.questions?.length) {
-        md += `**Questions raised in meeting:**\n`;
-        e.questions.forEach((q, qi) => { md += `${qi + 1}. ${q}\n`; });
-        md += `\n`;
-      }
-      if (e.notes) md += `**Meeting notes:** ${e.notes}\n\n`;
     });
-
     return md;
   }
 
   async function copyDecisionsOnly() {
-    const date = new Date().toLocaleDateString("en-AU", {
-      weekday: "long", day: "numeric", month: "long", year: "numeric"
-    });
-    let md = `## Brief Assessment — ${date}\n\n`;
-    sessionLog.forEach(e => {
-      const opt       = REC_OPTIONS.find(r => r.value === e.recommendation);
-      const finalOpt  = e.revised ? (REC_OPTIONS.find(r => r.value === e.revised.recommendation) || opt) : opt;
-      const rationale = e.revised ? e.revised.recommendation_rationale : e.rationale;
-      const conditions = e.revised?.conditions?.length ? e.revised.conditions : (e.conditions || []);
-      md += `**${e.title}** — ${finalOpt?.label || e.recommendation}`;
-      if (e.revised) md += ` *(revised after discussion)*`;
-      md += `\n${rationale}\n`;
-      if (conditions.length) {
-        conditions.forEach(c => { md += `- ${c}\n`; });
-      }
-      md += `\n`;
-    });
-
     const btn = document.getElementById("copyDecisionsBtn");
-    try {
-      await navigator.clipboard.writeText(md);
-      btn.textContent = "Copied ✓";
-      setTimeout(() => { btn.textContent = "Decisions only"; }, 2500);
-    } catch {
-      btn.textContent = "Copy failed";
-    }
+    try { await navigator.clipboard.writeText(buildDecisionsMarkdown()); btn.textContent = "Copied ✓"; setTimeout(() => { btn.textContent = "Decisions only"; }, 2500); }
+    catch { btn.textContent = "Copy failed"; }
   }
-
   async function copyToClipboard() {
-    const md  = buildSummaryMarkdown();
     const btn = document.getElementById("copyBtn");
-    try {
-      await navigator.clipboard.writeText(md);
-      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!`;
-      setTimeout(() => {
-        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Copy to clipboard`;
-      }, 2500);
-    } catch {
-      btn.textContent = "Copy failed — select all and copy manually";
-    }
+    try { await navigator.clipboard.writeText(buildFullMarkdown()); btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!`; setTimeout(() => { btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Full summary`; }, 2500); }
+    catch { btn.textContent = "Copy failed"; }
   }
 
   // ── CHAT ───────────────────────────────────────────────────────────────────
-  function handleChatKey(e) {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
-  }
+  function handleChatKey(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChatMessage(); } }
 
   async function sendChatMessage() {
     const input = document.getElementById("chatInput");
     const text  = input.value.trim();
     if (!text || !currentResult) return;
-
     const key = localStorage.getItem("anthropic_key");
     if (!key) { openKeyModal(); return; }
-
     input.value = "";
     appendChatMsg("user", text);
-
-    const sendBtn = document.getElementById("chatSendBtn");
-    sendBtn.disabled = true;
+    document.getElementById("chatSendBtn").disabled = true;
     const typingId = appendTyping();
 
-    // Build context system prompt from current brief + assessment
-    const dimSummary = Object.entries({
-      problem_clarity: "Problem Clarity", proportionality: "Proportionality",
-      resourcing_realism: "Resourcing Realism", efficiency_potential: "Efficiency Potential",
-      brief_completeness: "Brief Completeness", risk_sensitivity: "Risk & Sensitivity"
-    }).map(([id, label]) => {
-      const d = currentResult.dimensions?.[id] || {};
-      const gaps = (d.gaps || []).map(g => `    - ${g}`).join("\n");
-      return `${label}: ${d.rating?.toUpperCase() || "—"}\n  ${d.summary || ""}${gaps ? "\n" + gaps : ""}`;
+    const dimSummary = DIMENSIONS.map(dim => {
+      const d = currentResult.dimensions?.[dim.id] || {};
+      return `${dim.label}: ${(d.rating||"").toUpperCase()} — ${d.summary||""}`;
     }).join("\n");
 
-    const chatSystem = `You are a communications strategy advisor helping a City of Sydney assessment team interrogate or refine an AI assessment of a communications brief.
+    const chatSystem = `You are a communications strategy advisor helping a City of Sydney assessment team question or refine an AI assessment of a communications brief.
 
-The brief being assessed:
-"""
-${document.getElementById("briefInput").value || "(brief text not available)"}
-"""
+Brief:
+"""${document.getElementById("briefInput").value}"""
 
-The current AI assessment:
-- Title: ${currentResult.brief_title}
-- Summary: ${currentResult.brief_summary}
+Assessment:
 - Recommendation: ${currentResult.recommendation}
 - Rationale: ${currentResult.recommendation_rationale}
-- Conditions: ${(activeConditions.length ? activeConditions.join("; ") : "none")}
+- Conditions: ${activeConditions.join("; ") || "none"}
 
-Dimension ratings:
+Dimensions:
 ${dimSummary}
 
-The team may want to challenge a rating, provide additional context, ask why something was rated a certain way, or explore whether new information changes the recommendation. Be direct and specific. If new context changes your view, say so clearly and explain what would change. Keep responses concise — this is a live meeting context. Use plain paragraphs, avoid excessive bullet lists.`;
+Be direct and concise — this is a live meeting. If new context changes the view, say so clearly.`;
 
     chatHistory.push({ role: "user", content: text });
-
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": key,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true"
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: chatSystem,
-          messages: chatHistory
-        })
+        headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, system: chatSystem, messages: chatHistory })
       });
-
-      if (!res.ok) {
-        const e = await res.json().catch(() => ({}));
-        throw new Error(e?.error?.message || "API error " + res.status);
-      }
-
       const data  = await res.json();
       const reply = (data.content || []).map(c => c.text || "").join("").trim();
       chatHistory.push({ role: "assistant", content: reply });
       removeTyping(typingId);
       appendChatMsg("ai", reply);
-      // Show regenerate button once there's been at least one exchange
       document.getElementById("regenerateBtn").style.display = "inline-flex";
-
-    } catch (err) {
+    } catch(err) {
       removeTyping(typingId);
-      appendChatMsg("ai", `Sorry, something went wrong: ${err.message}`);
+      appendChatMsg("ai", `Error: ${err.message}`);
     } finally {
-      sendBtn.disabled = false;
+      document.getElementById("chatSendBtn").disabled = false;
       input.focus();
     }
   }
 
   function appendChatMsg(role, text) {
-    const container = document.getElementById("chatMessages");
-    const msg = document.createElement("div");
-    msg.className = `chat-msg ${role}`;
+    const c = document.getElementById("chatMessages");
+    const m = document.createElement("div");
+    m.className = `chat-msg ${role}`;
     const label = role === "user" ? "You" : "Assessment AI";
-    const labelClass = role === "user" ? "user-label" : "ai-label";
-    // Simple markdown-like rendering for AI responses
-    const formatted = role === "ai" ? simpleMarkdown(text) : `<p>${escHtml(text)}</p>`;
-    msg.innerHTML = `<div class="chat-msg-label ${labelClass}">${label}</div><div class="chat-msg-bubble">${formatted}</div>`;
-    container.appendChild(msg);
-    container.scrollTop = container.scrollHeight;
-    return msg;
+    const lc    = role === "user" ? "user-label" : "ai-label";
+    const body  = role === "ai" ? simpleMd(text) : `<p>${esc(text)}</p>`;
+    m.innerHTML = `<div class="chat-msg-label ${lc}">${label}</div><div class="chat-msg-bubble">${body}</div>`;
+    c.appendChild(m); c.scrollTop = c.scrollHeight;
   }
-
   function appendTyping() {
-    const container = document.getElementById("chatMessages");
-    const id = "typing-" + Date.now();
-    const msg = document.createElement("div");
-    msg.className = "chat-msg ai typing";
-    msg.id = id;
-    msg.innerHTML = `<div class="chat-msg-label ai-label">Assessment AI</div><div class="chat-msg-bubble">Thinking…</div>`;
-    container.appendChild(msg);
-    container.scrollTop = container.scrollHeight;
+    const c = document.getElementById("chatMessages");
+    const id = "t-" + Date.now();
+    const m = document.createElement("div");
+    m.className = "chat-msg ai typing"; m.id = id;
+    m.innerHTML = `<div class="chat-msg-label ai-label">Assessment AI</div><div class="chat-msg-bubble">Thinking…</div>`;
+    c.appendChild(m); c.scrollTop = c.scrollHeight;
     return id;
   }
-
-  function removeTyping(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
-  }
-
-  function simpleMarkdown(text) {
-    return text
-      .split("\n\n").map(para => {
-        if (para.startsWith("- ") || para.includes("\n- ")) {
-          const items = para.split("\n").filter(l => l.startsWith("- ")).map(l => `<li>${escHtml(l.slice(2))}</li>`).join("");
-          return `<ul>${items}</ul>`;
-        }
-        return `<p>${escHtml(para).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")}</p>`;
-      }).join("");
-  }
-
-  function escHtml(str) {
-    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function removeTyping(id) { const el = document.getElementById(id); if (el) el.remove(); }
+  function simpleMd(text) {
+    return text.split("\n\n").map(p => {
+      if (p.startsWith("- ") || p.includes("\n- ")) {
+        return `<ul>${p.split("\n").filter(l=>l.startsWith("- ")).map(l=>`<li>${esc(l.slice(2))}</li>`).join("")}</ul>`;
+      }
+      return `<p>${esc(p).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>")}</p>`;
+    }).join("");
   }
 
   // ── REGENERATE ─────────────────────────────────────────────────────────────
   async function regenerateAssessment() {
     if (!currentResult || !chatHistory.length) return;
-
     const key = localStorage.getItem("anthropic_key");
     if (!key) { openKeyModal(); return; }
-
     const btn = document.getElementById("regenerateBtn");
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner">⟳</span> Regenerating…`;
+    btn.disabled = true; btn.innerHTML = `<span class="spinner">⟳</span> Regenerating…`;
 
-    const chatTranscript = chatHistory.map(m =>
-      `${m.role === "user" ? "Assessor" : "AI"}: ${m.content}`
-    ).join("\n\n");
-
-    const regenSystem = `You are reassessing a City of Sydney communications brief after a discussion with the assessment team. Based on the original brief, the initial assessment, and the discussion that followed, produce a revised assessment.
-
-Return ONLY valid JSON in this exact structure — no markdown, no preamble:
-{
-  "recommendation": "",
-  "recommendation_rationale": "",
-  "conditions": [],
-  "what_changed": ""
-}
-
-- recommendation: one of "approve", "approve_conditions", "defer", "decline"
-- recommendation_rationale: 2-3 sentences reflecting any new context from the discussion
-- conditions: updated list of conditions/actions (may be same, fewer, or more than original)
-- what_changed: 1-2 sentences summarising what the discussion changed and why, or "No change to recommendation — discussion confirmed the original assessment." if unchanged`;
-
-    const regenPrompt = `Original brief:
-"""
-${document.getElementById("briefInput").value}
-"""
-
-Original assessment:
-- Recommendation: ${currentResult.recommendation}
-- Rationale: ${currentResult.recommendation_rationale}
-- Conditions: ${activeConditions.length ? activeConditions.join("; ") : "none"}
-
-Discussion:
-${chatTranscript}
-
-Produce a revised assessment reflecting what was discussed.`;
-
+    const transcript = chatHistory.map(m => `${m.role === "user" ? "Assessor" : "AI"}: ${m.content}`).join("\n\n");
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": key,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true"
-        },
+        headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: regenSystem,
-          messages: [{ role: "user", content: regenPrompt }]
+          model: "claude-sonnet-4-20250514", max_tokens: 1000,
+          system: `Reassess a City of Sydney communications brief after discussion. Return ONLY valid JSON:\n{"recommendation":"","recommendation_rationale":"","conditions":[],"what_changed":""}`,
+          messages: [{ role: "user", content: `Brief:\n"""${document.getElementById("briefInput").value}"""\n\nOriginal: ${currentResult.recommendation} — ${currentResult.recommendation_rationale}\n\nDiscussion:\n${transcript}\n\nRevise the assessment.` }]
         })
       });
-
-      if (!res.ok) {
-        const e = await res.json().catch(() => ({}));
-        throw new Error(e?.error?.message || "API error " + res.status);
-      }
-
       const data   = await res.json();
-      const raw    = (data.content || []).map(c => c.text || "").join("");
-      const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+      const parsed = JSON.parse((data.content||[]).map(c=>c.text||"").join("").replace(/```json|```/g,"").trim());
       revisedResult = parsed;
-      renderRevisedAssessment(parsed);
-
-    } catch (err) {
-      appendChatMsg("ai", `Regeneration failed: ${err.message}`);
-    } finally {
+      const opt   = REC_OPTIONS.find(r => r.value === parsed.recommendation) || REC_OPTIONS[0];
+      const badge = document.getElementById("revisedBadge");
+      badge.textContent = opt.label; badge.style.background = opt.color; badge.style.color = "#fff";
+      const rat = document.getElementById("revisedRationale");
+      rat.innerHTML = parsed.what_changed
+        ? `<em style="color:var(--cos-blue);display:block;margin-bottom:3px;font-size:12px;">${esc(parsed.what_changed)}</em>${esc(parsed.recommendation_rationale)}`
+        : esc(parsed.recommendation_rationale);
+      if (parsed.conditions?.length) {
+        activeConditions = [...parsed.conditions]; renderConditions();
+        document.getElementById("revisedConditionsList").innerHTML = parsed.conditions.map(c=>`<div class="condition-item"><span>${esc(c)}</span></div>`).join("");
+        document.getElementById("revisedConditionsBlock").style.display = "block";
+      }
+      document.getElementById("revisedBlock").style.display = "block";
+      document.getElementById("revisedBlock").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch(err) { appendChatMsg("ai", `Regeneration failed: ${err.message}`); }
+    finally {
       btn.disabled = false;
-      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;"><path d="M1 6a5 5 0 105-5 5 5 0 00-3.5 1.4L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 1v3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Regenerate assessment`;
+      btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;"><path d="M1 6a5 5 0 105-5 5 5 0 00-3.5 1.4L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 1v3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Regenerate`;
     }
   }
 
-  function renderRevisedAssessment(r) {
-    const opt   = REC_OPTIONS.find(o => o.value === r.recommendation) || REC_OPTIONS[0];
-    const badge = document.getElementById("revisedBadge");
-    badge.textContent      = opt.label;
-    badge.style.background = opt.color;
-    badge.style.color      = "#fff";
+  // ── UTILITIES ──────────────────────────────────────────────────────────────
+  function esc(str) { return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-    const rationale = document.getElementById("revisedRationale");
-    rationale.innerHTML = r.what_changed
-      ? `<em style="color:var(--cos-blue); display:block; margin-bottom:4px; font-size:12px;">${escHtml(r.what_changed)}</em>${escHtml(r.recommendation_rationale)}`
-      : escHtml(r.recommendation_rationale);
-
-    if (r.conditions?.length) {
-      activeConditions = [...r.conditions];
-      renderConditions();
-      document.getElementById("revisedConditionsList").innerHTML = r.conditions.map(c =>
-        `<div class="condition-item"><span>${c}</span></div>`
-      ).join("");
-      document.getElementById("revisedConditionsBlock").style.display = "block";
-    }
-
-    document.getElementById("revisedBlock").style.display = "block";
-    document.getElementById("revisedBlock").scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }
-
+  // ── RESET ──────────────────────────────────────────────────────────────────
   function assessAnother() {
     currentResult = null; currentOverride = null; currentLogged = false;
     activeConditions = []; chatHistory = []; revisedResult = null;
+    considerations = []; nextSteps = [];
     document.getElementById("chatMessages").innerHTML = "";
     document.getElementById("chatInput").value        = "";
-    document.getElementById("revisedBlock").style.display          = "none";
+    document.getElementById("revisedBlock").style.display           = "none";
     document.getElementById("revisedConditionsBlock").style.display = "none";
-    document.getElementById("regenerateBtn").style.display         = "none";
-    document.getElementById("briefInput").value           = "";
-    document.getElementById("inputError").style.display   = "none";
-    document.getElementById("inputPanel").style.display   = "block";
-    document.getElementById("resultsPanel").style.display = "none";
-    document.getElementById("questionsPanel").style.display  = "none";
+    document.getElementById("regenerateBtn").style.display          = "none";
+    document.getElementById("briefInput").value            = "";
+    document.getElementById("inputError").style.display    = "none";
+    document.getElementById("inputPanel").style.display    = "block";
+    document.getElementById("resultsPanel").style.display  = "none";
+    document.getElementById("questionsPanel").style.display = "none";
     document.getElementById("conditionsBlock").style.display = "none";
     document.getElementById("assessAnotherBtn").style.display = "none";
-    document.getElementById("dimsGrid").innerHTML = "";
     document.getElementById("briefInput").focus();
   }
 
   function resetTool() {
     assessAnother();
+    sessionLog = []; renderLog();
     document.getElementById("newBriefBtn").style.display = "none";
   }
 </script>
