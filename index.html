@@ -236,6 +236,16 @@
     .decision-title { font-size: 13px; font-weight: 700; color: #fff; }
     .decision-rationale { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 4px; }
 
+    /* ── NEXT STEP ROWS ── */
+    .next-step-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--bg); }
+    .next-step-row:last-child { border-bottom: none; }
+    .next-step-label { flex: 1; font-size: 13px; color: var(--text); line-height: 1.4; }
+    .next-step-assignee { width: 140px; flex-shrink: 0; border: 1.5px solid var(--border); border-radius: 3px; padding: 5px 8px; font-size: 12px; font-family: var(--font); color: var(--text); background: var(--surface); transition: border-color 0.15s; }
+    .next-step-assignee:focus { outline: none; border-color: var(--cos-blue); }
+    .next-step-assignee::placeholder { color: var(--muted); }
+    .next-step-remove { flex-shrink: 0; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0; opacity: 0.5; line-height: 1; }
+    .next-step-remove:hover { opacity: 1; color: var(--red); }
+
     /* ── MISC ── */
     .error-inline { font-size: 12px; color: var(--red); flex: 1; }
     .spinner { display: inline-block; animation: spin 0.85s linear infinite; }
@@ -374,11 +384,7 @@
 
         <div class="det-section">
           <div class="det-label">Next steps</div>
-          <div class="bullet-list" id="nextStepsList"></div>
-          <div class="bullet-input-row">
-            <textarea class="bullet-input" id="nextStepInput" rows="1" placeholder="Type a next step and press +" onkeydown="handleBulletKey(event,'nextStep')"></textarea>
-            <button class="bullet-add" onclick="addBullet('nextStep')" title="Add">+</button>
-          </div>
+          <div id="nextStepsList"></div>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
@@ -713,8 +719,8 @@ key_questions: 2-4 questions the meeting should resolve`;
     });
 
     // Determination form
-    renderBullets("consideration");
-    renderBullets("nextStep");
+    renderBullets();
+    initNextSteps(r.tactics);
     document.getElementById("logBtn").disabled = false;
     document.getElementById("logBtn").textContent = "Log decision";
     document.getElementById("assessAnotherBtn").style.display = "none";
@@ -772,47 +778,76 @@ key_questions: 2-4 questions the meeting should resolve`;
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addBullet(type); }
   }
   function addBullet(type) {
-    const inputId = type === "consideration" ? "considerationInput" : "nextStepInput";
-    const input   = document.getElementById(inputId);
-    const text    = input.value.trim();
+    const input = document.getElementById("considerationInput");
+    const text  = input.value.trim();
     if (!text) return;
-    if (type === "consideration") considerations.push(text);
-    else nextSteps.push(text);
+    considerations.push(text);
     input.value = "";
-    renderBullets(type);
+    renderBullets();
     input.focus();
   }
-  function removeBullet(type, i) {
-    if (type === "consideration") considerations.splice(i,1);
-    else nextSteps.splice(i,1);
-    renderBullets(type);
+  function removeBullet(i) {
+    considerations.splice(i, 1);
+    renderBullets();
   }
-  function renderBullets(type) {
-    const listId = type === "consideration" ? "considerationsList" : "nextStepsList";
-    const items  = type === "consideration" ? considerations : nextSteps;
-    document.getElementById(listId).innerHTML = items.map((t,i) =>
+  function renderBullets() {
+    document.getElementById("considerationsList").innerHTML = considerations.map((t,i) =>
       `<div class="bullet-entry">
         <span class="bullet-entry-dot">•</span>
         <span class="bullet-entry-text">${esc(t)}</span>
-        <button class="bullet-remove" onclick="removeBullet('${type}',${i})">×</button>
+        <button class="bullet-remove" onclick="removeBullet(${i})">×</button>
       </div>`
     ).join("");
   }
 
+  // ── NEXT STEPS (tactic-based) ──────────────────────────────────────────────
+  // nextSteps is an array of { label, assignee, included }
+  function initNextSteps(tactics) {
+    nextSteps = (tactics || []).map(t => ({
+      label:    t.label,
+      assignee: "",
+      included: true,
+    }));
+    renderNextSteps();
+  }
+  function removeNextStep(i) {
+    nextSteps.splice(i, 1);
+    renderNextSteps();
+  }
+  function renderNextSteps() {
+    const list = document.getElementById("nextStepsList");
+    if (!nextSteps.length) { list.innerHTML = `<div style="font-size:12px;color:var(--muted);font-style:italic;">No tactics extracted from brief.</div>`; return; }
+    list.innerHTML = nextSteps.map((s, i) =>
+      `<div class="next-step-row">
+        <span class="next-step-label">${esc(s.label)}</span>
+        <input class="next-step-assignee" type="text" placeholder="Assignee" value="${esc(s.assignee)}" oninput="nextSteps[${i}].assignee=this.value" />
+        <button class="next-step-remove" onclick="removeNextStep(${i})" title="Remove">×</button>
+      </div>`
+    ).join("");
+  }
+  function getNextSteps() {
+    // Re-read assignee values from DOM in case of direct input
+    const rows = document.querySelectorAll(".next-step-row");
+    rows.forEach((row, i) => {
+      if (nextSteps[i]) nextSteps[i].assignee = row.querySelector(".next-step-assignee")?.value || "";
+    });
+    return nextSteps.map(s => ({ label: s.label, assignee: s.assignee }));
+  }
+
   // ── LOG ────────────────────────────────────────────────────────────────────
   function logDecision() {
-    if (!currentResult || currentLogged) return;
+    if (!currentResult) return;
     const r   = currentResult;
     const rec = currentOverride || r.recommendation;
-    sessionLog.push({
-      index:            sessionLog.length + 1,
+    const entry = {
+      index:            currentLogged ? sessionLog[sessionLog.length - 1].index : sessionLog.length + 1,
       title:            r.brief_title || "Untitled Brief",
       summary:          r.brief_summary || "",
       recommendation:   rec,
       rationale:        r.recommendation_rationale || "",
       conditions:       [...activeConditions],
       considerations:   [...considerations],
-      nextSteps:        [...nextSteps],
+      nextSteps:        getNextSteps(),
       tactics:          r.tactics || [],
       dimensions:       r.dimensions || {},
       questions:        r.key_questions || [],
@@ -821,10 +856,15 @@ key_questions: 2-4 questions the meeting should resolve`;
       aiRecommendation: r.recommendation,
       time:             new Date().toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" }),
       date:             new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" }),
-    });
-    currentLogged = true;
-    document.getElementById("logBtn").disabled    = true;
-    document.getElementById("logBtn").textContent = "Logged ✓";
+    };
+    if (currentLogged) {
+      sessionLog[sessionLog.length - 1] = entry;
+    } else {
+      sessionLog.push(entry);
+      currentLogged = true;
+    }
+    document.getElementById("logBtn").textContent = "Update log";
+    document.getElementById("logBtn").disabled    = false;
     document.getElementById("assessAnotherBtn").style.display = "inline-flex";
     renderLog();
   }
@@ -887,7 +927,10 @@ key_questions: 2-4 questions the meeting should resolve`;
       if (e.nextSteps?.length) {
         html += `<div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.08em;margin:5px 0 3px;">Next steps</div>`;
         html += `<ul style="margin:0 0 0 16px;">`;
-        e.nextSteps.forEach(s => { html += `<li style="font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:2px;">${esc(s)}</li>`; });
+        e.nextSteps.forEach(s => {
+          const assignee = s.assignee ? ` <span style="color:rgba(255,255,255,0.35);">— ${esc(s.assignee)}</span>` : "";
+          html += `<li style="font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:2px;">${esc(s.label)}${assignee}</li>`;
+        });
         html += `</ul>`;
       }
       if (finalConds?.length) {
@@ -953,7 +996,9 @@ key_questions: 2-4 questions the meeting should resolve`;
       }
       if (e.nextSteps?.length) {
         md += `**Next steps**\n`;
-        e.nextSteps.forEach(s => { md += `- ${s}\n`; });
+        e.nextSteps.forEach(s => {
+          md += `- ${s.label}${s.assignee ? ` — ${s.assignee}` : ""}\n`;
+        });
         md += `\n`;
       }
       if (finalConds?.length) {
@@ -1144,6 +1189,7 @@ Be direct and concise — this is a live meeting. If new context changes the vie
     currentResult = null; currentOverride = null; currentLogged = false;
     activeConditions = []; chatHistory = []; revisedResult = null;
     considerations = []; nextSteps = [];
+    renderBullets(); renderNextSteps();
     document.getElementById("chatMessages").innerHTML = "";
     document.getElementById("chatInput").value        = "";
     document.getElementById("revisedBlock").style.display           = "none";
