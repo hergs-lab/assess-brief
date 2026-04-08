@@ -85,10 +85,13 @@
 
     /* ── COMPACT RAG STRIP ── */
     .rag-strip { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0; }
-    .rag-chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; border: 1.5px solid; cursor: pointer; transition: filter 0.12s, box-shadow 0.12s; }
-    .rag-chip:hover { filter: brightness(0.93); }
+    .rag-chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; border: 1.5px solid; transition: filter 0.12s, box-shadow 0.12s; }
+    .rag-chip.expandable { cursor: pointer; }
+    .rag-chip.expandable:hover { filter: brightness(0.9); }
     .rag-chip.expanded { box-shadow: 0 0 0 2px currentColor; }
     .rag-chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .rag-chip-chevron { font-size: 9px; margin-left: 2px; opacity: 0.7; transition: transform 0.15s; }
+    .rag-chip.expanded .rag-chip-chevron { transform: rotate(180deg); }
     .rag-chip.green { color: var(--cos-green-access); background: #f0faf3; border-color: var(--cos-green-access); }
     .rag-chip.green .rag-chip-dot { background: var(--cos-green-access); }
     .rag-chip.amber { color: var(--amber); background: var(--amber-bg); border-color: #d97706; }
@@ -338,16 +341,11 @@
 
       <!-- Compact RAG + flags -->
       <div class="card" style="animation: fadeUp 0.3s ease 0.1s both;">
-        <div class="section-label">Assessment <span style="font-weight:400; text-transform:none; letter-spacing:0; font-size:10px; color:var(--muted);">— click a dimension to expand</span></div>
+        <div class="section-label">Assessment <span style="font-weight:400; text-transform:none; letter-spacing:0; font-size:10px; color:var(--muted);">— amber and red expand</span></div>
         <div class="rag-strip" id="ragStrip"></div>
         <div class="flags-list" id="flagsList" style="display:none;"></div>
       </div>
 
-      <!-- Questions -->
-      <div class="questions-panel" id="questionsPanel" style="display:none;">
-        <div class="section-label">Questions for the meeting</div>
-        <div id="questionsList"></div>
-      </div>
 
       <!-- Recommendation + determination -->
       <div class="card" id="recPanel" style="animation: fadeUp 0.3s ease 0.16s both;">
@@ -678,10 +676,11 @@ key_questions: 2-4 questions the meeting should resolve`;
       const d = r.dimensions?.[dim.id] || {};
       const chip = document.createElement("div");
       chip.className = `rag-chip ${d.rating || "amber"}`;
-      chip.innerHTML = `<div class="rag-chip-dot"></div>${dim.label}`;
 
       if (d.rating !== "green" && (d.summary || d.flags?.length)) {
         hasFlags = true;
+        chip.className += " expandable";
+        chip.innerHTML = `<div class="rag-chip-dot"></div>${dim.label}<span class="rag-chip-chevron">▾</span>`;
         const flagId = `flag-${di}`;
         const flag = document.createElement("div");
         flag.className = `flag-item ${d.rating || "amber"}`;
@@ -692,7 +691,6 @@ key_questions: 2-4 questions the meeting should resolve`;
 
         chip.onclick = () => {
           const isOpen = flag.style.display !== "none";
-          // Close all flags first
           flagsList.querySelectorAll(".flag-item").forEach(f => f.style.display = "none");
           strip.querySelectorAll(".rag-chip").forEach(c => c.classList.remove("expanded"));
           if (!isOpen) {
@@ -704,9 +702,8 @@ key_questions: 2-4 questions the meeting should resolve`;
           }
         };
       } else {
-        // Green chip — clicking shows a brief confirmation
+        chip.innerHTML = `<div class="rag-chip-dot"></div>${dim.label}`;
         chip.title = d.summary || "No issues";
-        chip.style.cursor = "default";
       }
       strip.appendChild(chip);
     });
@@ -719,15 +716,6 @@ key_questions: 2-4 questions the meeting should resolve`;
     }
 
     // Questions
-    const qs = r.key_questions || [];
-    const qPanel = document.getElementById("questionsPanel");
-    if (qs.length) {
-      document.getElementById("questionsList").innerHTML = qs.map((q,i) =>
-        `<div class="question-item"><span class="question-num">${i+1}.</span><span>${esc(q)}</span></div>`
-      ).join("");
-      qPanel.style.display = "block";
-    } else { qPanel.style.display = "none"; }
-
     // Recommendation
     applyRecBadge(r.recommendation);
     document.getElementById("recRationale").textContent = r.recommendation_rationale || "";
@@ -1268,7 +1256,6 @@ Be direct and concise — this is a live meeting. If new context changes the vie
     document.getElementById("inputError").style.display    = "none";
     document.getElementById("inputPanel").style.display    = "block";
     document.getElementById("resultsPanel").style.display  = "none";
-    document.getElementById("questionsPanel").style.display = "none";
     document.getElementById("conditionsBlock").style.display = "none";
     document.getElementById("assessAnotherBtn").style.display = "none";
     document.getElementById("briefInput").focus();
