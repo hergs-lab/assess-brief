@@ -813,10 +813,13 @@ key_questions: 2-4 questions the meeting should resolve`;
 
   // ── NEXT STEPS (tactic-based + bespoke) ────────────────────────────────────
   function initNextSteps(tactics) {
-    // Only pre-populate tactics the meeting has marked as proceed (default)
-    nextSteps = (tactics || [])
-      .filter(t => t._status !== "skip")
-      .map(t => ({ label: t.label, assignee: "", bespoke: false, discuss: t._status === "discuss" }));
+    const hero = { label: "Create Jira HERO and child issues", assignee: "", bespoke: false, fixed: true };
+    nextSteps = [
+      hero,
+      ...(tactics || [])
+        .filter(t => t._status !== "skip")
+        .map(t => ({ label: t.label, assignee: "", bespoke: false, discuss: t._status === "discuss" }))
+    ];
     renderNextSteps();
   }
   function removeNextStep(i) { syncNextStepsFromDOM(); nextSteps.splice(i, 1); renderNextSteps(); }
