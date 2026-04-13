@@ -991,12 +991,6 @@ key_questions: 2-4 questions the meeting should resolve`;
         });
         html += `</ul>`;
       }
-      if (finalConds?.length) {
-        html += `<div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.08em;margin:5px 0 3px;">Conditions</div>`;
-        html += `<ul style="margin:0 0 0 16px;">`;
-        finalConds.forEach(c => { html += `<li style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:2px;">${esc(c)}</li>`; });
-        html += `</ul>`;
-      }
       html += `</div>`;
     });
     html += `</div>`;
@@ -1058,11 +1052,6 @@ key_questions: 2-4 questions the meeting should resolve`;
         e.nextSteps.forEach(s => {
           md += `- ${s.label}${s.assignee ? ` — ${s.assignee}` : ""}\n`;
         });
-        md += `\n`;
-      }
-      if (finalConds?.length) {
-        md += `**Conditions**\n`;
-        finalConds.forEach(c => { md += `- ${c}\n`; });
         md += `\n`;
       }
     });
