@@ -1232,31 +1232,29 @@ Be direct and concise — this is a live meeting. If new context changes the vie
   function esc(str) { return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
   // ── RESET ──────────────────────────────────────────────────────────────────
+  function el(id) { return document.getElementById(id); }
+
   function assessAnother() {
     currentResult = null; currentOverride = null; currentLogged = false;
     activeConditions = []; chatHistory = []; revisedResult = null;
     considerations = []; nextSteps = [];
     renderBullets(); renderNextSteps();
-    document.getElementById("keeleyOutput").style.display = "none";
-    document.getElementById("keeleyOutput").textContent   = "";
-    document.getElementById("keeleyPlaceholder").style.display = "block";
-    document.getElementById("chatInput").value        = "";
-    document.getElementById("nextStepInput").value    = "";
-    document.getElementById("revisedBlock").style.display           = "none";
-    document.getElementById("regenerateBtn").style.display          = "none";
-    document.getElementById("briefInput").value            = "";
-    document.getElementById("inputError").style.display    = "none";
-    document.getElementById("inputPanel").style.display    = "block";
-    document.getElementById("resultsPanel").style.display  = "none";
-    document.getElementById("conditionsBlock").style.display = "none";
-    document.getElementById("assessAnotherBtn").style.display = "none";
-    document.getElementById("briefInput").focus();
+    const hide = (id) => { const e = el(id); if (e) e.style.display = "none"; };
+    const show = (id, d) => { const e = el(id); if (e) e.style.display = d || "block"; };
+    const val  = (id, v) => { const e = el(id); if (e) e.value = v; };
+    const txt  = (id, v) => { const e = el(id); if (e) e.textContent = v; };
+    hide("keeleyOutput"); txt("keeleyOutput", ""); show("keeleyPlaceholder");
+    val("nextStepInput", "");
+    hide("revisedBlock"); hide("regenerateBtn"); hide("conditionsBlock"); hide("assessAnotherBtn");
+    val("briefInput", ""); hide("inputError");
+    show("inputPanel"); hide("resultsPanel");
+    el("briefInput")?.focus();
   }
 
   function resetTool() {
     assessAnother();
     sessionLog = []; renderLog();
-    document.getElementById("newBriefBtn").style.display = "none";
+    el("newBriefBtn").style.display = "none";
   }
 </script>
 </body>
