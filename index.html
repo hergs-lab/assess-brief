@@ -109,25 +109,19 @@
     /* ── TACTIC LIST ── */
     .tactic-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 0; }
     .tactic-item { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-    .tactic-item.status-skip    { border-color: #fecaca; }
-    .tactic-item.status-discuss { border-color: var(--amber-bd); }
     .tactic-header { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface); }
     .tactic-label { flex: 1; font-size: 13px; font-weight: 600; color: var(--cos-deep-blue); }
-    .tactic-status-row { display: flex; gap: 4px; flex-shrink: 0; }
-    .tactic-status-btn {
-      font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 2px;
-      border: 1.5px solid var(--border); cursor: pointer; font-family: var(--font);
-      letter-spacing: 0.04em; text-transform: uppercase; background: var(--bg);
-      color: var(--muted); transition: all 0.12s;
-    }
-    .tactic-status-btn:hover { border-color: var(--muted); color: var(--text); }
-    .tactic-status-btn.active-proceed { background: #f0faf3; color: var(--cos-green-access); border-color: var(--cos-green-access); }
-    .tactic-status-btn.active-discuss { background: var(--amber-bg); color: var(--amber); border-color: #d97706; }
-    .tactic-status-btn.active-skip    { background: var(--red-bg); color: var(--red); border-color: #dc2626; }
+    .tactic-effort { flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 2px; letter-spacing: 0.05em; border: 1.5px solid; white-space: nowrap; }
+    .tactic-effort.effort-low  { color: var(--cos-green-access); background: #f0faf3; border-color: var(--cos-green-access); }
+    .tactic-effort.effort-mid  { color: var(--amber); background: var(--amber-bg); border-color: #d97706; }
+    .tactic-effort.effort-high { color: var(--red); background: var(--red-bg); border-color: #dc2626; }
     .tactic-concern { font-size: 12px; color: var(--amber); padding: 6px 12px 7px; background: #fff8ee; border-top: 1px solid var(--amber-bd); line-height: 1.45; font-style: italic; }
     .tactic-verbatim { font-size: 11px; color: var(--muted); padding: 6px 12px 7px; background: #fafafa; border-top: 1px solid var(--border); line-height: 1.5; display: none; }
     .tactic-toggle { font-size: 10px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 0; font-family: var(--font); flex-shrink: 0; text-decoration: underline; text-underline-offset: 2px; }
     .tactic-toggle:hover { color: var(--cos-deep-blue); }
+    .tactic-total { font-size: 12px; color: var(--muted); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .tactic-total-num { font-size: 15px; font-weight: 700; color: var(--cos-deep-blue); }
+    .tactic-total-label { font-size: 11px; color: var(--muted); }
 
     /* ── QUESTIONS ── */
     .questions-panel { background: var(--cos-deep-blue); border-radius: 4px; padding: 16px 18px; margin-bottom: 12px; position: relative; overflow: hidden; animation: fadeUp 0.3s ease 0.2s both; }
@@ -478,7 +472,7 @@
   // ASSESSMENT CRITERIA — edit dimensions here, redeploy to update for the team
   // ─────────────────────────────────────────────────────────────────────────────
 
-  const SYSTEM_PROMPT = `You are an expert communications strategist assessing ACO (Audience, Challenges, Opportunities) briefs for a City of Sydney marketing and communications unit.
+  const SYSTEM_PROMPT = `You are an expert communications strategist assessing ACO (Audience, Challenges, Opportunities) briefs for a City of Sydney marketing and communications unit. You have access to the City of Sydney channel matrix which defines appropriate uses, effort ratings, and rules for each channel.
 
 Assess the brief and return ONLY valid JSON — no markdown, no preamble.
 
@@ -491,6 +485,7 @@ Return this exact structure:
     {
       "label": "",
       "verbatim": "",
+      "effort": 0,
       "concern": ""
     }
   ],
@@ -512,14 +507,15 @@ KEELEY COMPLIMENT:
 Generate a warm, genuine, specific 1-2 sentence compliment for a team member named Keeley. Focus on her collaborative working style and contribution as a team player. Make it feel personal and real, not generic. Vary it each time. Do not use the words "dedication" or "invaluable".
 
 TACTICS:
-Extract each proposed tactic or channel from the brief as a separate item.
-- label: clean, plain English name (e.g. "Social media content", "Media release and outreach")
+Extract each proposed tactic or channel from the brief as a separate item. Cross-reference against the City of Sydney channel matrix below.
+- label: clean, plain English name matching the matrix channel where possible
 - verbatim: the exact text from the brief describing this tactic
-- concern: a single plain-English sentence flagging any resourcing, proportionality, or timing issue worth raising in the meeting. Empty string if none.
+- effort: effort score (1-5) from the channel matrix. If not in matrix, estimate based on similar channels. Use 0 if genuinely unknown.
+- concern: cite matrix guidance when relevant — flag objective mismatches, rule violations, effort underestimation, or where a lower-effort alternative exists. One sentence. Empty string if no concern.
 
 DIMENSIONS:
 - problem_clarity: Is the audience genuinely specific? Challenges evidenced? Opportunities grounded?
-- proportionality: Is the scope commensurate with the need? Are tactics the right weight?
+- proportionality: Is the scope commensurate with the need? Are tactics the right weight? Reference total effort across all tactics.
 - resourcing_realism: Realistic capacity? Credible timelines? Specialist input available?
 - efficiency_potential: Assets reusable? Templatable? Batchable with other briefs?
 - brief_completeness: Enough to brief a team and start work? What is missing?
@@ -532,7 +528,148 @@ For each dimension:
 
 recommendation: approve / approve_conditions / defer / decline
 conditions: specific conditions or actions required (empty if approve or decline)
-key_questions: 2-4 questions the meeting should resolve`;
+key_questions: 2-4 questions the meeting should resolve
+
+─────────────────────────────────────────────────────────
+CITY OF SYDNEY CHANNEL MATRIX (reference when assessing tactics)
+─────────────────────────────────────────────────────────
+Update this section when channel formats or rules change.
+
+WEBSITES
+CoS News: EDM digest | inform/educate | effort varies by type:
+  - Article: content marketing | build/inform/ask | effort 4 | offer value then ask; check if corporate site better
+  - Article: news story | inform | effort 3 | must be scannable; check if corporate site better
+  - Announcement | inform | effort 2 | quick and easy
+  - Image gallery | inform | effort 3 | visual story; doesn't need to be complex
+  - Audio story | inform | effort 5
+  - Video | inform | effort 5 | needs broader distribution strategy than CoS News alone
+
+Corporate site:
+  - Web page new | inform/ask | effort 4.5 | new thing needs new page (strategy, consultation, works, document, report, artwork); high effort
+  - Web page minor edit | inform | effort 1 | straightforward edits; audience expects accuracy so must be timely
+  - Web page rebuild | inform | effort 4.5 | as required only
+  - Homepage feature | inform/ask | effort 1 | banner should make sense without CTA for inform; banner good for ask; updated weekly
+  - Page alert | inform | effort 1 | temporary service/facility changes only
+  - Update related pages | inform | effort 2 | funnel users via user journey not just Google search
+  - Global alert | inform | effort 1 | LAST RESORT — only for significant events (asbestos, Covid, NYE)
+
+What's On:
+  - Event listing | ask | effort 2 | prerequisite for most ask tactics
+  - Homepage feature | ask | effort 1 | needs article, program page or event listing to link to
+  - Article | inform/ask | effort 3 | can be cross-published from CoS News; set canonical URL
+  - Program page | inform | effort 3 | groups collection of events over set period; minimum 8-10 events; requires ongoing curation
+
+SOCIAL MEDIA
+Facebook:
+  - Single image post | inform | effort 2 | UGC works well; link in comments is best practice
+  - Video | inform/ask | effort 5 | think: how to get people to watch and keep watching
+  - Image gallery/carousel | inform | effort 3.5 | each image needs caption; FB may split into awkward individual posts
+  - Image w/ text overlay + link | inform/ask | effort 2.5 | link in comments
+  - Link post | - | effort 1 | DO NOT USE — deprecated
+  - Responses to comments | build | effort 2.5 | daily as needed; authentic responses build trust
+  - Comments on posts | inform/ask | effort 1 | often forgotten; good for extra info or link
+  - Facebook event | ask | effort 2 | must have broad appeal and large capacity; can attract spam; needs paid spend most of the time
+  - Stories | inform | N/A | usually cross-posted from Instagram
+  - Advertising | ask | effort 3 | needs creative, landing page, ad copy; not a quick win; target specific audience
+
+Instagram:
+  - In-feed single image | inform | effort 2 | UGC works well
+  - In-feed image gallery carousel | inform | effort 3 | can create panorama or narrative carousel
+  - In-feed image w/ text overlay | inform/ask | effort 2
+  - In-feed swipeable gallery (Canva template) | inform/educate | effort 3 | good for breaking down complex info
+  - Reels | inform/ask | effort 3 | lead with the hook
+  - Stories with link | inform/ask | effort 2
+  - Stories: What's On weekly roundup | - | effort 2 | NO LONGER IN USE
+  - Stories: Quiz | educate | effort 4 | interactive; works well for waste etc
+  - Stories: explainer | educate | effort 2
+  - Link in bio | ask | effort 1 | combine with in-feed; remember to remove or expire; use UTM
+  - Advertising | ask | effort 2.5
+
+Twitter/X:
+  - Currently inactive — do not propose as primary channel
+  - Single image post | inform | effort 2
+  - Link tweet | inform | effort 2
+  - Simple tweet | inform | effort 1
+  - Retweet | inform | effort 1 | for relevant third-party content
+  - Advertising | ask | effort 2.5 | currently not spending on Twitter
+
+YouTube:
+  - Longform video | inform | effort 5 | YouTube strategy still being defined
+  - Advertising preroll | build | effort 5 | doesn't lead to many link clicks; good for awareness
+
+LinkedIn:
+  - Single image post | inform | effort 2 | responds well to non-business posts
+  - Image gallery | inform | effort 2
+  - Link post | inform | effort 2 | can link to CoS News, corporate site or relevant landing page
+  - Video | inform | effort 5 | works well on LinkedIn
+  - Link post incl. image w/ text overlay | inform | effort 2 | customise thumbnail; can adjust ratio for more feed space
+  - Jobs post | build | effort 2 | fortnightly alternating Tuesday
+  - Tenders post | - | effort 2 | NO LONGER ACTIVE
+  - Advertising | ask | effort 2.5 | target by industry or job title; mainly boost content
+
+Google My Business:
+  - Post | inform | effort 1 | reach people on Google search; can add image, CTA, copy
+  - Event post | ask | effort 1 | promote events at specific locations
+  - Details update | inform | effort 1 | opening/closing times most common
+
+EDMs:
+  - CoS News Digest | inform/ask | effort varies | auto-picks up published content; weekly Tuesday 5.15pm; content deadline Monday COB; custom inclusions must be requested
+  - What's On EDM | ask | effort varies | weekly Thursday; events must be listed on What's On
+  - Library EDM | inform/ask | effort varies | monthly; large subscriber base; space for CoS programs and events
+  - Green Square EDM | inform/ask | effort varies | good for GS residents; approx quarterly
+  - Community Centres EDMs | inform/ask | effort varies | one per centre; good for local communities; monthly-ish
+  - City Business Digest | inform/ask | effort varies | fortnightly; curated by City Business but we can influence
+  - Our News (internal) | inform | effort varies | weekly Wednesday; don't forget internal audiences
+  - Waste and recycling opt-in | inform | effort varies | ~5.5k subscribers; approx monthly
+  - Urban ecology | inform | effort varies | ad hoc
+  - Pine Street | inform | effort varies | monthly; usually just Pine Street events
+  - Sustainable Destination Partnership | inform | effort varies | small list; probably not for general content
+
+MEDIA:
+  - Media release | inform/ask | effort 3 | RESERVED for big announcements with wide audience appeal; must be newsworthy with strong human interest; ideally picture-driven
+  - Media response | inform | effort 3 | in response to inquiries; share City's position; protect reputation
+  - Holding statement | inform | effort 2 | prepared in anticipation of negative/complex issue; not released proactively
+  - Media call | ask | effort 4 | ONLY for major events (Christmas, NYE, SLF) or major announcements with strong media interest, good talent and visuals; otherwise offer exclusive pitch or photo opp
+
+ADVERTISING — DIGITAL:
+  - Facebook/Instagram ads | ask | effort 2.5 | various formats; video more involved; image/copy lowest effort; Stories good using Canva
+  - TikTok video | ask | effort 5 | currently advertising only — no active account; ads should be self-contained
+  - LinkedIn post boost | ask | effort 2 | mainly boost existing content; post determines objective
+  - YouTube video ads | ask | effort 5 | targeting based on Google audience segments
+  - Broadcast video on demand | build | effort 5 | less audience targeting; higher budgets; non-skippable
+  - Google search text ads | ask | effort 3 | captures active interest; pay per click; labour intensive to set up but simple to manage
+  - Native content | inform | effort 2.5 | reach people in context of interests; needs content first and strong images
+  - Digital display MREC/leaderboard | build | effort 2.5 | our own News and What's On sites allow display ads; artwork through studio; minimise frames
+  - Media partners | build | effort 5 | builds trust via brand association; high budgets; very involved process
+  - Content advertorial/listings | inform | effort 2.5 | provision of content and images (e.g. Ellaslist, ArtsHub)
+  - Nova social native boost | ask | effort varies | existing social media newsfeed ads across open web
+  - Podcast/audio ads | build | effort 2 | higher budgets than local radio; good for wide reach; production by audio platform
+
+ADVERTISING — NON-DIGITAL:
+  - Radio ads | build | effort 2 | community stations good for resident targeting; commercial radio indexes low for LGA residents
+  - Newspaper ads | build | effort 5 | limited local press options; metro expensive
+  - Other outdoor | build | effort 5 | retail, crosstracks, billboards, postcards; artwork through studio
+
+OUTDOOR AND LARGE FORMAT:
+  - Community screen (Canva template) | inform | effort 3 | 6 screens updated weekly Mon-Sun; images must be super high res; QR codes must be clean
+  - QMS advertising screen artwork | ask | effort 5 | currently one campaign at a time; artwork through studio; weekly to Sunday
+  - THH lightbox artwork | build | effort 5 | best for long-term projects; artwork through studio; updated every couple of months; must be printed
+  - Billboards: Darling and Parramatta Road | build | effort 5 | minimal content; no QR codes; awareness primary objective; complements broader campaign; run minimum 2 weeks
+
+SIGNAGE:
+  - Hoarding | inform | effort varies | determine size and use before requesting artwork
+  - Corflute boards | inform | effort varies | determine size and use before requesting artwork
+  - Decals | inform | effort varies | site-specific; must be installed and removed
+  - Vinyl banners | inform | effort varies | determine size and use before requesting artwork
+  - Triffids | inform | effort varies | determine size and use before requesting artwork
+  - Street banners | inform | effort varies | determine size and use before requesting artwork
+  - Paper signs/posters | inform | effort varies | determine size and use before requesting artwork
+  - Scrim | inform | effort varies | determine size and use before requesting artwork
+
+OTHER:
+  - Letter | inform | effort varies | need audience, area, letter type for estimate
+  - Invite (digital/print) | ask | effort varies | need to know audience
+─────────────────────────────────────────────────────────`;
 
   const DIMENSIONS = [
     { id: "problem_clarity",      label: "Problem Clarity" },
@@ -608,7 +745,7 @@ key_questions: 2-4 questions the meeting should resolve`;
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 2000, system: SYSTEM_PROMPT, messages: [{ role: "user", content: "Assess this ACO brief:\n\n" + text }] })
+        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 3000, system: SYSTEM_PROMPT, messages: [{ role: "user", content: "Assess this ACO brief:\n\n" + text }] })
       });
       if (!res.ok) { const e = await res.json().catch(()=>{}); throw new Error(e?.error?.message || "API error " + res.status); }
       const data   = await res.json();
@@ -655,15 +792,33 @@ key_questions: 2-4 questions the meeting should resolve`;
       const item = document.createElement("div");
       item.className = "tactic-item";
       item.id = `tactic-${i}`;
+      const effort = t.effort || 0;
+      const effortClass = effort <= 2 ? "effort-low" : effort <= 3.5 ? "effort-mid" : "effort-high";
+      const effortLabel = effort > 0 ? `Effort ${effort}` : "Effort ?";
       item.innerHTML =
         `<div class="tactic-header">
           <span class="tactic-label">${esc(t.label)}</span>
+          <span class="tactic-effort ${effortClass}">${effortLabel}</span>
           <button class="tactic-toggle" onclick="toggleVerbatim(this)">brief text</button>
         </div>` +
         (t.concern ? `<div class="tactic-concern">⚑ ${esc(t.concern)}</div>` : "") +
         `<div class="tactic-verbatim">${esc(t.verbatim)}</div>`;
       tacticList.appendChild(item);
     });
+
+    // Total effort
+    const knownEfforts = (r.tactics || []).filter(t => t.effort > 0);
+    const totalEffort  = knownEfforts.reduce((sum, t) => sum + t.effort, 0);
+    const unknownCount = (r.tactics || []).length - knownEfforts.length;
+    if ((r.tactics || []).length > 0) {
+      const totalRow = document.createElement("div");
+      totalRow.className = "tactic-total";
+      totalRow.innerHTML =
+        `<span class="tactic-total-label">Total estimated effort</span>
+         <span class="tactic-total-num">${totalEffort}${unknownCount > 0 ? "+" : ""}</span>
+         <span class="tactic-total-label">across ${(r.tactics||[]).length} tactic${(r.tactics||[]).length !== 1 ? "s" : ""}${unknownCount > 0 ? ` (${unknownCount} unscored)` : ""}</span>`;
+      tacticList.appendChild(totalRow);
+    }
 
     // RAG strip + flags
     const strip = document.getElementById("ragStrip");
