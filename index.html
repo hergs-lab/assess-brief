@@ -745,7 +745,7 @@ OTHER:
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 3000, system: SYSTEM_PROMPT, messages: [{ role: "user", content: "Assess this ACO brief:\n\n" + text }] })
+        body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 3000, system: SYSTEM_PROMPT, messages: [{ role: "user", content: "Assess this ACO brief:\n\n" + text }] })
       });
       if (!res.ok) { const e = await res.json().catch(()=>{}); throw new Error(e?.error?.message || "API error " + res.status); }
       const data   = await res.json();
@@ -1295,7 +1295,7 @@ Be direct and concise — this is a live meeting. If new context changes the vie
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, system: chatSystem, messages: chatHistory })
+        body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1000, system: chatSystem, messages: chatHistory })
       });
       const data  = await res.json();
       const reply = (data.content || []).map(c => c.text || "").join("").trim();
@@ -1355,7 +1355,7 @@ Be direct and concise — this is a live meeting. If new context changes the vie
         method: "POST",
         headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514", max_tokens: 1000,
+          model: "claude-sonnet-4-6", max_tokens: 1000,
           system: `Reassess a City of Sydney communications brief after discussion. Return ONLY valid JSON:\n{"recommendation":"","recommendation_rationale":"","conditions":[],"what_changed":""}`,
           messages: [{ role: "user", content: `Brief:\n"""${document.getElementById("briefInput").value}"""\n\nOriginal: ${currentResult.recommendation} — ${currentResult.recommendation_rationale}\n\nDiscussion:\n${transcript}\n\nRevise the assessment.` }]
         })
